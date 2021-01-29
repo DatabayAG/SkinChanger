@@ -1,0 +1,23 @@
+{
+  "name": "mbeym/skin-changer",
+  "description": "An ILIAS plugin to change users skins based on the role",
+  "type": "project",
+  "license": "GPL",
+  "authors": [
+    {
+      "name": "Marvin Beym",
+      "email": "mBeym@databay.de"
+    }
+  ],
+  "require": {
+
+  },
+  "autoload": {
+    "psr-4": {
+      "SkinChanger\\": "src/"
+    }
+  },
+  "require-dev": {
+
+  }
+}
