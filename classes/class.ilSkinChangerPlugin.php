@@ -40,8 +40,8 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         $skinId = "";
         $styleId = "";
 
-        $assignedRoles = $review->assignedRoles($DIC->user()->getId());
-        $availableStyles = ilStyleDefinition::getAllSkinStyles();
+        $assignedRoles = $review->assignedRoles($user->getId());
+
         foreach ($assignedRoles as $assignedRole) {
             $assignedSkin = $repository->findSkinByRoleId((int) $assignedRole);
             if ($assignedSkin) {
@@ -50,7 +50,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
             }
         }
 
-        foreach ($availableStyles as $availableStyle) {
+        foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
             if ($availableStyle["skin_id"] == $skinId) {
                 $styleId = $availableStyle["style_id"];
                 break;
@@ -61,6 +61,43 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
             return;
         }
 
+        //Checks if user changed his skin using the override link and if so changes the users skin to the defined override one.
+        if (self::checkUserHasOverriddenSkin($user)) {
+            self::setUserSkin($user, $override["skinId"], $override["styleId"]);
+            return;
+        }
+
+        self::setUserSkin($user, $skinId, $styleId);
+    }
+
+    /**
+     * Checks if the user has overridden his skin using the override link
+     * and returns the skinId and styleId for changing to it.
+     * @param ilObjUser $user
+     * @return string[]|null
+     * @throws ilSystemStyleException
+     */
+    private static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
+    {
+        $skinOverride = $user->getPref("skinOverride");
+        if ($skinOverride) {
+            foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
+                if ($availableStyle["skin_id"] == $skinOverride) {
+                    return ["skinId" => $skinOverride, "styleId" => $availableStyle["style_id"]];
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the user skin and checks if the skin is already the desired skin.
+     * @param $user
+     * @param $skinId
+     * @param $styleId
+     */
+    protected static function setUserSkin($user, $skinId, $styleId)
+    {
         if ($user->getPref("skin") != $skinId || $user->getPref("style") != $styleId) {
             $user->setPref("skin", $skinId);
             $user->setPref("style", $styleId);
