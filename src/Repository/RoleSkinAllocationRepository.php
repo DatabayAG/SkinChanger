@@ -121,4 +121,15 @@ class RoleSkinAllocationRepository
         }
         return $data;
     }
+
+    /**
+     * Removes all rows from the database table
+     *
+     * @return bool
+     */
+    public function deleteAll() : bool
+    {
+        $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename}");
+        return $affected_rows == 1;
+    }
 }

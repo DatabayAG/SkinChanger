@@ -1,5 +1,33 @@
 $( document ).ready(() => {
   let counter = 0;
+  let ajaxAllocationsUrl = $("#ajax_allocations_url").val();
+
+  $.ajax({
+    url: ajaxAllocationsUrl,
+    type: "GET",
+    dataType: 'text',
+    cache: false,
+    contentType: false,
+    processData: false,
+    success: (responseString) => {
+      let existingAllocations = JSON.parse(responseString);
+
+      if(existingAllocations.length > 0){
+        let keyElements = $("select[id*=\"" + `[key]` + "\"]");
+        let valueElements = $("select[id*=\"" + `[value]` + "\"]");
+
+        keyElements.each(function( index ) {
+          $( this ).val(existingAllocations[index].key);
+        });
+
+        valueElements.each(function ( index ) {
+          $( this ).val(existingAllocations[index].value);
+        });
+      }
+    }
+  });
+
+
 
   const refreshRows = (newCounterValue) => {
     counter = newCounterValue;

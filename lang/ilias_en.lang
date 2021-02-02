@@ -1,0 +1,7 @@
+ui_uihk_skinchanger_config#:#SkinChanger configuration
+roleToSkinInput#:#Role to skin allocation
+info_roleToSkinInput#:#Users with the role (left) get the allocated skin (right) on login.
+role#:#Role
+skin#:#Skin
+save#:#Save
+updateSuccessful#:#Update successful

@@ -2,8 +2,10 @@
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 use SkinChanger\Form\ConfigForm;
-use SkinChanger\Model\RoleSkinAllocation;
 use SkinChanger\Repository\RoleSkinAllocationRepository;
+use ILIAS\Filesystem\Stream\Streams;
+use ILIAS\DI\HTTPServices;
+use ILIAS\HTTP\Response\Sender\ResponseSendingException;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -14,10 +16,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 {
-    /**
-     * @var ilGlobalPageTemplate
-     */
     private ilGlobalPageTemplate $tpl;
+    private ilCtrl $ctrl;
+    private RoleSkinAllocationRepository $repository;
+    private HTTPServices $http;
 
     /**
      * ilSkinChangerConfigGUI constructor.
@@ -26,6 +28,9 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
         $this->tpl = $DIC->ui()->mainTemplate();
+        $this->repository = RoleSkinAllocationRepository::getInstance();
+        $this->http = $DIC->http();
+        $this->ctrl = $DIC->ctrl();
     }
 
     /**
@@ -46,53 +51,18 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
      *
      * @return void
      */
-    public function saveSettings(): void
+    public function saveSettings() : void
     {
-        global $DIC;
-        $request = $DIC->http()->request();
-        $requestBody = $request->getParsedBody();
+        $form = new ConfigForm($this->getPluginObject());
+        $form->setValuesByPost();
+        if ($form->checkInput()) {
+            $form->handleSubmit();
 
-        $rows = $requestBody["rows"];
-
-        /**
-         * @var $roleToSkinAllocations RoleSkinAllocation[]
-         */
-        $repository = RoleSkinAllocationRepository::getInstance();
-
-        /**
-         * @var $allocations RoleSkinAllocation[]
-         */
-        $allocations = [];
-        for ($i = 0; $i < count($rows["key"]); $i++) {
-            $allocations[$i] = (new RoleSkinAllocation())
-                ->setRolId((int) $rows["key"][$i])
-                ->setSkinId((string) $rows["value"][$i]);
+            ilUtil::sendSuccess($this->getPluginObject()->txt("updateSuccessful"), true);
+            $this->ctrl->redirectByClass(ilobjcomponentsettingsgui::class, "view");
         }
 
-
-        //Todo: alternative wäre die ganze Datenbank zu leeren und dann neu zu schreiben mit den gerade erstellten zuweisungen
-        //Todo: Frage ist was effizienter ist.
-        //Todo: Doppelte eintraäge müssen noch gefiltert werden, wenn user mehrer mit gleicher rolle macht
-        //z.B.  Admin => ilias
-        //      Admin => databay
-        //Dann sollte der Admin => ilias entfernt werden, weil => databay weiter unten ist. Dann auch nur Admin => databay speichern.
-        //Das würde durch das komplette neu schreiben der Datenbank einfacher gehen.
-        $existingAllocations = $repository->readAll();
-        $allocationsToRemove = array_filter($existingAllocations, function ($existingAllocation) use ($allocations) {
-            $counter = 0;
-            foreach ($allocations as $allocation) {
-                $counter += $allocation->getRolId() != $existingAllocation->getRolId() ? 1 : 0;
-            }
-            return $counter == count($allocations);
-        });
-
-        foreach ($allocationsToRemove as $allocation) {
-            $repository->remove($allocation->getId());
-        }
-
-        foreach ($allocations as $allocation) {
-            $repository->create($allocation);
-        }
+        $this->tpl->setContent($form->getHTML());
     }
 
     /**
@@ -110,6 +80,30 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
             default:
                 $this->{$this->getDefaultCommand()}();
         }
+    }
+
+    /**
+     * Function called by ajax and returns an array of allocations from the database.
+     * Returns json array with key => value.
+     *
+     * @throws ResponseSendingException
+     * @return void
+     */
+    public function ajax_allocations(): void
+    {
+        $allocations = $this->repository->readAll();
+        $data = [];
+
+        foreach ($allocations as $key => $allocation) {
+            $data[$key] = [
+                "key" => $allocation->getRolId(),
+                "value" => $allocation->getSkinId()
+            ];
+        }
+        $responseStream = Streams::ofString(json_encode($data));
+        $this->http->saveResponse($this->http->response()->withBody($responseStream));
+        $this->http->sendResponse();
+        $this->http->close();
     }
 
     /**
