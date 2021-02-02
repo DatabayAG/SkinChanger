@@ -1,6 +1,14 @@
 $( document ).ready(() => {
   let counter = 0;
   let ajaxAllocationsUrl = $("#ajax_allocations_url").val();
+  let defaultSkin = "default";
+
+
+  function isValueInSelect($select, data_value){
+    return $($select).children('option').map(function(index, opt){
+      return opt.value;
+    }).get().includes(data_value);
+  }
 
   $.ajax({
     url: ajaxAllocationsUrl,
@@ -21,7 +29,12 @@ $( document ).ready(() => {
         });
 
         valueElements.each(function ( index ) {
-          $( this ).val(existingAllocations[index].value);
+          if(!isValueInSelect($( this ), existingAllocations[index].value)){
+            $( this ).val(defaultSkin);
+          }
+          else{
+            $( this ).val(existingAllocations[index].value);
+          }
         });
       }
     }
@@ -42,8 +55,8 @@ $( document ).ready(() => {
 
     valueElements.each(function( index ) {
       let newValue = `rows[value][${index}]`;
-      $( this ).attr("id", `rows[value][${index}]`);
-      $( this ).attr("name", `rows[value][${index}]`);
+      $( this ).attr("id", newValue);
+      $( this ).attr("name", newValue);
     })
 
   }

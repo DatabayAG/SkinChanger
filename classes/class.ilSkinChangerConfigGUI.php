@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /* Copyright (c) 1998-2020 ILIAS open source, Extended GPL, see docs/LICENSE */
 
 use SkinChanger\Form\ConfigForm;
@@ -11,7 +12,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Class ilSkinChangerConfigGUI
- *
  * @author  Marvin Beym <mbeym@databay.de>
  */
 class ilSkinChangerConfigGUI extends ilPluginConfigGUI
@@ -48,7 +48,6 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 
     /**
      * Saves plugin configuration
-     *
      * @return void
      */
     public function saveSettings() : void
@@ -67,7 +66,6 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 
     /**
      * Calls the function for a received command
-     *
      * @param $cmd
      * @return void
      */
@@ -85,11 +83,10 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
     /**
      * Function called by ajax and returns an array of allocations from the database.
      * Returns json array with key => value.
-     *
-     * @throws ResponseSendingException
      * @return void
+     * @throws ResponseSendingException
      */
-    public function ajax_allocations(): void
+    public function ajax_allocations() : void
     {
         $allocations = $this->repository->readAll();
         $data = [];
@@ -108,7 +105,6 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 
     /**
      * Returns the default command
-     *
      * @return string
      */
     private function getDefaultCommand() : string

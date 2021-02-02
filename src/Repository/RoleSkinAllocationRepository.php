@@ -132,4 +132,10 @@ class RoleSkinAllocationRepository
         $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename}");
         return $affected_rows == 1;
     }
+
+    public function findSkinByRoleId(int $rol_id)
+    {
+        $result = $this->db->query("SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
+        return $this->db->fetchAssoc($result)["skin_id"];
+    }
 }
