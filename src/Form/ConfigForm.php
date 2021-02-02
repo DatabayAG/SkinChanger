@@ -51,6 +51,9 @@ class ConfigForm extends ilPropertyFormGUI
         $rows->setInfo($this->plugin->txt("info_roleToSkinInput"));
 
         $numberOfAllocations = count($this->repository->readAll());
+
+        //Gets overridden by javascript code that replaces <input> elements with <select> elements
+        //Only used to define how many rows the allocation table has.
         $allocations = [];
         for ($i = 0; $i < $numberOfAllocations; $i++) {
             $allocations[$i . "_key"] = $i . "_value";

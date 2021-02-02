@@ -1,6 +1,6 @@
 ui_uihk_skinchanger_config#:#SkinChanger Konfiguration
 roleToSkinInput#:#Rolle zu Skin Zuweisung
-info_roleToSkinInput#:#Benutzer mit der Rolle (Links) erhalten beim einloggen den Skin (Rechts) zugewiesen.
+info_roleToSkinInput#:#Benutzer mit der Rolle (Links) erhalten beim einloggen den Skin (Rechts) zugewiesen.<br>Höhere Zuweisungen überschreiben Zuweisungen unter ihnen.
 role#:#Rolle
 skin#:#Skin
 save#:#Speichern

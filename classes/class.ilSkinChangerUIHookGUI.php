@@ -11,6 +11,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 {
+    //rol_id's added to this array will be removed from the selectable allocation roles.
+    private const blacklistedRoles = ["14"];
     /**
      * ilRepositoryResubmissionUIHookGUI constructor.
      */
@@ -44,17 +46,22 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     private function modifyKVP($html) : array
     {
         global $DIC;
-        $roles = $DIC->rbac()->review()->getAssignableRoles();
+        $roles = array_filter($DIC->rbac()->review()->getAssignableRoles(), function ($role) {
+            foreach (self::blacklistedRoles as $blacklistedRole) {
+                return $role["rol_id"] != $blacklistedRole;
+            }
+            return true;
+        });
         $availableStyles = ilStyleDefinition::getAllSkinStyles();
-
-        $skinOptions = [];
-        foreach ($availableStyles as $style) {
-            $skinOptions[$style["skin_id"]] = $style["skin_name"];
-        }
 
         $roleOptions = [];
         foreach ($roles as $role) {
             $roleOptions[$role["rol_id"]] = $role["title"];
+        }
+
+        $skinOptions = [];
+        foreach ($availableStyles as $style) {
+            $skinOptions[$style["skin_id"]] = $style["skin_name"];
         }
 
         $roleSelectInput = new ilSelectInputGUI("t", "ROLE_POSTVAR");
