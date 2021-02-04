@@ -14,19 +14,9 @@ use SkinChanger\Model\RoleSkinAllocation;
  */
 class RoleSkinAllocationRepository
 {
-    /**
-     * @var RoleSkinAllocationRepository
-     */
-    private static $instance;
-    /**
-     * @var ilDBInterface
-     */
-    protected $db;
-
-    /**
-     * @var string
-     */
-    private $tablename = 'ui_uihk_skcr';
+    private static ?RoleSkinAllocationRepository $instance = null;
+    protected ilDBInterface $db;
+    private string $tablename = 'ui_uihk_skcr_alloc';
 
     /**
      * RoleSkinAllocationRepository constructor.
@@ -63,16 +53,11 @@ class RoleSkinAllocationRepository
      */
     public function create(RoleSkinAllocation $allocation)
     {
-        if (empty($allocation->getId())) {
-            $allocation->setId((int) $this->db->nextId($this->tablename));
-        }
-
         $this->db->manipulateF(
-            "INSERT INTO " . $this->tablename . " (id, rol_id, skin_id) VALUES " .
-            "(%s, %s, %s)",
-            ["integer", "integer", "text"],
+            "INSERT INTO " . $this->tablename . " (rol_id, skin_id) VALUES " .
+            "(%s, %s)",
+            ["integer", "text"],
             [
-                $allocation->getId(),
                 $allocation->getRolId(),
                 $allocation->getSkinId(),
             ]
@@ -93,14 +78,14 @@ class RoleSkinAllocationRepository
     }
 
     /**
-     * Removes a row from the database table by id.
+     * Removes a row from the database table by role id.
      *
-     * @param $id
+     * @param $rolId
      * @return bool
      */
-    public function remove($id) : bool
+    public function remove($rolId) : bool
     {
-        $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename} WHERE id = {$this->db->quote($id, "integer")}");
+        $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rolId, "integer")}");
         return $affected_rows == 1;
     }
 
@@ -115,7 +100,6 @@ class RoleSkinAllocationRepository
         foreach ($data as $key => $value) {
             $data[$key] = new RoleSkinAllocation();
             $data[$key]
-                ->setId((int) $value["id"])
                 ->setRolId((int) $value["rol_id"])
                 ->setSkinId((string) $value["skin_id"]);
         }
