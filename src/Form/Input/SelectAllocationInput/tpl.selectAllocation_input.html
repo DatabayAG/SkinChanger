@@ -1,0 +1,30 @@
+<div class="selectAllocation_input" id="{FIELD_ID}">
+    <div class="selectAllocations">
+        <table class="selectAllocationTable table table-condensed table-striped">
+            <thead>
+            <tr>
+                <th>{KEY_HEADER}</th>
+                <th>{VALUE_HEADER}</th>
+                <th>{ACTION_HEADER}</th>
+            </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN cell -->
+                <tr class="selectAllocation_cell">
+                    <td class="selectAllocation_table_key">
+                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[key][]">{KEY_OPTIONS}</select>
+                    </td>
+                    <td class="selectAllocation_table_value">
+                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[value][]">{VALUE_OPTIONS}</select>
+                    </td>
+                    <td class="selectAllocation_table_actions">
+                        <button type="button" name="add" class="btn">{ADD_BUTTON}</button>
+                        <button type="button" name="remove" class="btn">{REMOVE_BUTTON}</button>
+                    </td>
+                </tr>
+                <!-- END cell -->
+            </tbody>
+        </table>
+
+    </div>
+</div>

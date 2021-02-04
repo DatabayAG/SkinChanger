@@ -62,7 +62,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         }
 
         //Checks if user changed his skin using the override link and if so changes the users skin to the defined override one.
-        if (self::checkUserHasOverriddenSkin($user)) {
+        if (($override = self::checkUserHasOverriddenSkin($user))) {
             self::setUserSkin($user, $override["skinId"], $override["styleId"]);
             return;
         }
@@ -79,8 +79,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     private static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
     {
-        $skinOverride = $user->getPref("skinOverride");
-        if ($skinOverride) {
+        if (($skinOverride = $user->getPref("skinOverride"))) {
             foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
                 if ($availableStyle["skin_id"] == $skinOverride) {
                     return ["skinId" => $skinOverride, "styleId" => $availableStyle["style_id"]];

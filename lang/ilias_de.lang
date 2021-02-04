@@ -3,5 +3,6 @@ roleToSkinInput#:#Rolle zu Skin Zuweisung
 info_roleToSkinInput#:#Benutzer mit der Rolle (Links) erhalten beim einloggen den Skin (Rechts) zugewiesen.<br>Höhere Zuweisungen überschreiben Zuweisungen unter ihnen.
 role#:#Rolle
 skin#:#Skin
+action#:#Aktion
 save#:#Speichern
 updateSuccessful#:#Aktualisierung erfolgreich

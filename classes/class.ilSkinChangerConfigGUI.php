@@ -4,9 +4,7 @@
 
 use SkinChanger\Form\ConfigForm;
 use SkinChanger\Repository\RoleSkinAllocationRepository;
-use ILIAS\Filesystem\Stream\Streams;
 use ILIAS\DI\HTTPServices;
-use ILIAS\HTTP\Response\Sender\ResponseSendingException;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -36,19 +34,20 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
     /**
      * Shows the plugin configuration
      * @return void
-     * @throws ilPluginException
+     * @throws ilPluginException|ilSystemStyleException
      */
     public function showSettings()
     {
         /** @var ilSkinChangerPlugin $this */
         $form = new ConfigForm($this->getPluginObject());
-
+        $form->bindObject($this->repository->readAll());
         $this->tpl->setContent($form->getHTML());
     }
 
     /**
      * Saves plugin configuration
      * @return void
+     * @throws ilSystemStyleException
      */
     public function saveSettings() : void
     {
@@ -78,29 +77,6 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
             default:
                 $this->{$this->getDefaultCommand()}();
         }
-    }
-
-    /**
-     * Function called by ajax and returns an array of allocations from the database.
-     * Returns json array with key => value.
-     * @return void
-     * @throws ResponseSendingException
-     */
-    public function ajax_allocations() : void
-    {
-        $allocations = $this->repository->readAll();
-        $data = [];
-
-        foreach ($allocations as $key => $allocation) {
-            $data[$key] = [
-                "key" => $allocation->getRolId(),
-                "value" => $allocation->getSkinId()
-            ];
-        }
-        $responseStream = Streams::ofString(json_encode($data));
-        $this->http->saveResponse($this->http->response()->withBody($responseStream));
-        $this->http->sendResponse();
-        $this->http->close();
     }
 
     /**
