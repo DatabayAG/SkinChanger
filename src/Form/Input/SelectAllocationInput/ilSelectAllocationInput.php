@@ -9,6 +9,9 @@ use ilTemplate;
 use ilTemplateException;
 use ilGlyphGUI;
 use ilPlugin;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Exception;
 
 /**
  * Class ilSelectAllocationInput
@@ -17,6 +20,10 @@ use ilPlugin;
  */
 class ilSelectAllocationInput extends ilFormPropertyGUI
 {
+    /**
+     * @var RequestInterface|ServerRequestInterface
+     */
+    private static $request;
     /**
      * @var Container|mixed
      */
@@ -229,5 +236,34 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     protected function getFolderPath() : string
     {
         return strstr(realpath(__DIR__), "Customizing") . "/";
+    }
+
+    /**
+     * @param string $postVar
+     * @return string[]|null
+     * @throws Exception
+     */
+    public static function convertPostToKeyValuePair(string $postVar) : ?array
+    {
+        if (!self::$request) {
+            global $DIC;
+            self::$request = $DIC->http()->request();
+        }
+
+        $postData = $requestBody = self::$request->getParsedBody()[$postVar];
+
+        $convertedKeyValuePairs = [];
+        if ($postData) {
+            $keys = $postData["key"];
+            $values = $postData["value"];
+            if (count($keys) != count($values)) {
+                throw new Exception("post keys and values count dont match");
+            }
+
+            for ($i = 0; $i < count($keys); $i++) {
+                $convertedKeyValuePairs[$keys[$i]] = $values[$i];
+            }
+        }
+        return $convertedKeyValuePairs;
     }
 }

@@ -13,6 +13,7 @@ use SkinChanger\Model\RoleSkinAllocation;
 use SkinChanger\Form\Input\SelectAllocationInput\ilSelectAllocationInput;
 use ilStyleDefinition;
 use ilSystemStyleException;
+use Exception;
 
 /**
  * Class ConfigForm
@@ -87,20 +88,20 @@ class ConfigForm extends ilPropertyFormGUI
     /**
      * Handles the form submit.
      * @return void
+     * @throws Exception
      */
     public function handleSubmit() : void
     {
-        $requestBody = $this->request->getParsedBody();
-        $rows = $requestBody["roleToSkinAllocation"];
 
         /**
          * @var $allocations RoleSkinAllocation[]
          */
         $allocations = [];
-        for ($i = 0; $i < count($rows["key"]); $i++) {
+
+        foreach (ilSelectAllocationInput::convertPostToKeyValuePair("roleToSkinAllocation") as $key => $value) {
             $newAllocation = (new RoleSkinAllocation())
-                ->setRolId((int) $rows["key"][$i])
-                ->setSkinId((string) $rows["value"][$i]);
+                ->setRolId((int) $key)
+                ->setSkinId((string) $value);
 
             $allocationAlreadyExists = false;
 
@@ -111,9 +112,10 @@ class ConfigForm extends ilPropertyFormGUI
                 }
             }
             if (!$allocationAlreadyExists) {
-                $allocations[$i] = $newAllocation;
+                array_push($allocations, $newAllocation);
             }
         }
+
         $this->repository->deleteAll();
 
         foreach ($allocations as $allocation) {
