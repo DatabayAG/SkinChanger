@@ -77,7 +77,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @return string[]|null
      * @throws ilSystemStyleException
      */
-    private static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
+    public static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
     {
         $skinOverride = $user->getPref("skinOverride");
         if ($skinOverride) {
@@ -96,7 +96,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @param $skinId
      * @param $styleId
      */
-    protected static function setUserSkin($user, $skinId, $styleId)
+    public static function setUserSkin($user, $skinId, $styleId)
     {
         if ($user->getPref("skin") != $skinId || $user->getPref("style") != $styleId) {
             $user->setPref("skin", $skinId);
