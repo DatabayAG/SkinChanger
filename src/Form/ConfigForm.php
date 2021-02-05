@@ -22,7 +22,6 @@ use Exception;
  */
 class ConfigForm extends ilPropertyFormGUI
 {
-    private const blacklistedRoles = ["14"];
     private ilSkinChangerPlugin $plugin;
     private ilToolbarGUI $toolbar;
 
@@ -55,7 +54,7 @@ class ConfigForm extends ilPropertyFormGUI
         $this->setTitle($plugin->txt("ui_uihk_skinchanger_config"));
 
         $roleOptions = [];
-        foreach ($this->filterRoles($DIC->rbac()->review()->getAssignableRoles(), self::blacklistedRoles) as $role) {
+        foreach ($DIC->rbac()->review()->getAssignableRoles() as $role) {
             $roleOptions[$role["rol_id"]] = $role["title"];
         }
 
@@ -121,22 +120,6 @@ class ConfigForm extends ilPropertyFormGUI
         foreach ($allocations as $allocation) {
             $this->repository->create($allocation);
         }
-    }
-
-    /**
-     * Filters roles to remove blacklisted or not wanted roles by id.
-     * @param array $roles
-     * @param array $roleIdsToFilterOut
-     * @return array
-     */
-    private function filterRoles(array $roles, array $roleIdsToFilterOut) : array
-    {
-        return array_filter($roles, function ($role) use ($roleIdsToFilterOut) {
-            foreach ($roleIdsToFilterOut as $roleId) {
-                return $role["rol_id"] != $roleId;
-            }
-            return true;
-        });
     }
 
     /**

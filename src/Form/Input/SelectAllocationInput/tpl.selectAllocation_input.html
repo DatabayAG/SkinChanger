@@ -9,22 +9,30 @@
             </tr>
             </thead>
             <tbody>
-                <!-- BEGIN cell -->
+                <!-- BEGIN row -->
                 <tr class="selectAllocation_cell">
                     <td class="selectAllocation_table_key">
-                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[key][]">{KEY_OPTIONS}</select>
+                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[key][]">
+                            <!-- BEGIN keyOption -->
+                            <option value="{OPTION_VALUE}" {OPTION_SELECTED}>{OPTION_TEXT}</option>";
+                            <!-- END keyOption -->
+                        </select>
                     </td>
                     <td class="selectAllocation_table_value">
-                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[value][]">{VALUE_OPTIONS}</select>
+                        <select class="selectAllocationSelect form-control" name="{POST_VAR}[value][]">
+                            <!-- BEGIN valueOption -->
+                            <option value="{OPTION_VALUE}" {OPTION_SELECTED}>{OPTION_TEXT}</option>";
+                            <!-- END valueOption -->
+                        </select>
                     </td>
                     <td class="selectAllocation_table_actions">
                         <button type="button" name="add" class="btn">{ADD_BUTTON}</button>
                         <button type="button" name="remove" class="btn">{REMOVE_BUTTON}</button>
                     </td>
                 </tr>
-                <!-- END cell -->
+                {ERROR}
+                <!-- END row -->
             </tbody>
         </table>
-
     </div>
 </div>

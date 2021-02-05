@@ -146,13 +146,14 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
 
         foreach ($this->options as $optionKey => $optionValue) {
             $tpl->setVariable("POST_VAR", $this->getPostVar());
-            $tpl->setVariable("KEY_OPTIONS", $this->convertToHtmlOptions($this->keyOptions, (string) $optionKey));
-            $tpl->setVariable("VALUE_OPTIONS", $this->convertToHtmlOptions($this->valueOptions, (string) $optionValue));
+
+            $this->createOptions($tpl, $this->keyOptions, $optionKey, "keyOption");
+            $this->createOptions($tpl, $this->valueOptions, $optionValue, "valueOption");
 
             $tpl->setVariable("ADD_BUTTON", ilGlyphGUI::get(ilGlyphGUI::ADD));
             $tpl->setVariable("REMOVE_BUTTON", ilGlyphGUI::get(ilGlyphGUI::REMOVE));
 
-            $tpl->setCurrentBlock('cell');
+            $tpl->setCurrentBlock('row');
             $tpl->parseCurrentBlock();
         }
 
@@ -210,23 +211,21 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     }
 
     /**
-     * Converts a string array to a html select options string
-     * @param array  $options
-     * @param string $optionToBeSelected
-     * @return string
+     * Creates the select options and parses them into the template.
+     * @param ilTemplate $tpl
+     * @param string[]   $options
+     * @param int|string $optionToBeSelected
+     * @param string     $blockName
      */
-    private function convertToHtmlOptions(array $options, string $optionToBeSelected) : string
+    private function createOptions(ilTemplate $tpl, array $options, $optionToBeSelected, string $blockName)
     {
-        $html = "";
-
-        foreach ($options as $key => $option) {
-            if ($key == $optionToBeSelected) {
-                $html .= "<option value=\"" . $key . "\" selected>{$option}</option>";
-            } else {
-                $html .= "<option value=\"" . $key . "\">{$option}</option>";
-            }
+        foreach ($options as $key => $value) {
+            $tpl->setVariable("OPTION_VALUE", $key);
+            $tpl->setVariable("OPTION_TEXT", $value);
+            $tpl->setVariable("OPTION_SELECTED", $optionToBeSelected == $key ? "selected" : "");
+            $tpl->setCurrentBlock($blockName);
+            $tpl->parseCurrentBlock();
         }
-        return $html;
     }
 
     /**

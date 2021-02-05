@@ -11,6 +11,11 @@ use SkinChanger\Repository\RoleSkinAllocationRepository;
 class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 {
     /**
+     * @var int[]
+     */
+    private const blacklistedUserIds = [ANONYMOUS_USER_ID];
+
+    /**
      * @inheritdoc
      */
     public function getPluginName() : string
@@ -41,6 +46,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         $styleId = "";
 
         $assignedRoles = $review->assignedRoles($user->getId());
+
+        foreach (self::blacklistedUserIds as $userId) {
+            if ($user->getId() == $userId) {
+                return;
+            }
+        }
 
         foreach ($assignedRoles as $assignedRole) {
             $assignedSkin = $repository->findSkinByRoleId((int) $assignedRole);
