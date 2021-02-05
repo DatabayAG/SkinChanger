@@ -48,6 +48,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      * @var string[]
      */
     private array $tableHeaders = ["key" => "Key", "value" => "Value", "action" => "Action"];
+    private bool $allowOnlySingleAllocation = false;
     private ilPlugin $plugin;
 
     /**
@@ -115,7 +116,18 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
                 $this->setAlert($this->plugin->txt("selectAllocationInput_count_not_match"));
                 return false;
             }
-            return true;
+            if ($this->allowOnlySingleAllocation) {
+                $foundKeys = [];
+                foreach ($keys as $key) {
+                    $foundKeys[$key] += 1;
+                }
+
+                foreach ($foundKeys as $key => $foundOccurrences) {
+                    if ($foundOccurrences > 1) {
+                        $this->errors[$key] = $this->plugin->txt("selectAllocationInput_already_exists");
+                    }
+                }
+            }
         } elseif ($this->getRequired()) {
             $this->setAlert('');
             return false;
@@ -141,20 +153,38 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $tpl->setVariable("ACTION_HEADER", $this->tableHeaders["action"]);
 
         if (count($this->options) == 0) {
-            $this->options = [array_keys($this->keyOptions)[0] => array_keys($this->valueOptions)[0]];
+            array_push($this->options, [array_keys($this->keyOptions)[0] => array_keys($this->valueOptions)[0]]);
         }
 
-        foreach ($this->options as $optionKey => $optionValue) {
-            $tpl->setVariable("POST_VAR", $this->getPostVar());
+        $postOptions = $this->dic->http()->request()->getParsedBody()[$this->getPostVar()];
 
-            $this->createOptions($tpl, $this->keyOptions, $optionKey, "keyOption");
-            $this->createOptions($tpl, $this->valueOptions, $optionValue, "valueOption");
+        //If values in post are different then values defined by user. (Ex.: when submitting and form fails check).
+        if (isset($postOptions["key"]) && count($postOptions["key"]) > count($this->options)) {
+            $this->options = [];
+            $keys = $postOptions["key"];
+            $values = $postOptions["value"];
+            for ($i = 0; $i < count($keys); $i++) {
+                array_push($this->options, [$keys[$i] => $values[$i]]);
+            }
+        }
 
-            $tpl->setVariable("ADD_BUTTON", ilGlyphGUI::get(ilGlyphGUI::ADD));
-            $tpl->setVariable("REMOVE_BUTTON", ilGlyphGUI::get(ilGlyphGUI::REMOVE));
+        foreach ($this->options as $values) {
+            foreach ($values as $optionKey => $optionValue) {
+                $tpl->setVariable("POST_VAR", $this->getPostVar());
 
-            $tpl->setCurrentBlock('row');
-            $tpl->parseCurrentBlock();
+                $this->createOptions($tpl, $this->keyOptions, $optionKey, "keyOption");
+                $this->createOptions($tpl, $this->valueOptions, $optionValue, "valueOption");
+
+                $tpl->setVariable("ADD_BUTTON", ilGlyphGUI::get(ilGlyphGUI::ADD));
+                $tpl->setVariable("REMOVE_BUTTON", ilGlyphGUI::get(ilGlyphGUI::REMOVE));
+
+                if (isset($this->errors[$optionKey])) {
+                    $tpl->setVariable('ERROR', $this->errors[$optionKey]);
+                    $tpl->parseCurrentBlock("error");
+                }
+                $tpl->setCurrentBlock('row');
+                $tpl->parseCurrentBlock();
+            }
         }
 
         $a_tpl->setCurrentBlock('prop_generic');
@@ -171,7 +201,9 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      */
     public function setOptions(array $options) : ilSelectAllocationInput
     {
-        $this->options = $options;
+        foreach ($options as $option) {
+            array_push($this->options, [$option]);
+        }
         return $this;
     }
 
@@ -241,6 +273,8 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     }
 
     /**
+     * Will convert the post values from the input into key value pairs.
+     * Will also remove duplicate keys keeping the first.
      * @param string $postVar
      * @return string[]|null
      * @throws Exception
@@ -267,5 +301,16 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
             }
         }
         return $convertedKeyValuePairs;
+    }
+
+    /**
+     * Will prevent the form from submitting when multiple rows with the same key exist.
+     * @param bool allowOnlySingleAllocation
+     * @return ilSelectAllocationInput
+     */
+    public function setAllowOnlySingleAllocation(bool $allowOnlySingleAllocation) : ilSelectAllocationInput
+    {
+        $this->allowOnlySingleAllocation = $allowOnlySingleAllocation;
+        return $this;
     }
 }

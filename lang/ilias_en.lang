@@ -6,3 +6,5 @@ skin#:#Skin
 action#:#Aktion
 save#:#Save
 updateSuccessful#:#Update successful
+
+selectAllocationInput_already_exists#:#Already defined

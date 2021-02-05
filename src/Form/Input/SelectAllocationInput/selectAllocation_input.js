@@ -18,6 +18,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
     let row = event.target.parentNode.parentNode;
     let clone = row.cloneNode(true);
     row.after(clone);
+    let errorMessage = clone.querySelector(".help-block");
+    if(errorMessage){
+      errorMessage.remove();
+    }
     clone.querySelector("button[name=add]").addEventListener("click", addRow);
     clone.querySelector("button[name=remove]").addEventListener("click", removeRow);
   }

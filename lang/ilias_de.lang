@@ -6,3 +6,5 @@ skin#:#Skin
 action#:#Aktion
 save#:#Speichern
 updateSuccessful#:#Aktualisierung erfolgreich
+
+selectAllocationInput_already_exists#:#Bereits definiert

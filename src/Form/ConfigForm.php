@@ -69,6 +69,7 @@ class ConfigForm extends ilPropertyFormGUI
             "roleToSkinAllocation"
         );
         $selectAllocationInput
+            ->setAllowOnlySingleAllocation(true)
             ->setKeyOptions($roleOptions)
             ->setValueOptions($skinOptions)
             ->setTableHeaders(
@@ -97,22 +98,12 @@ class ConfigForm extends ilPropertyFormGUI
          */
         $allocations = [];
 
-        foreach (ilSelectAllocationInput::convertPostToKeyValuePair("roleToSkinAllocation") as $key => $value) {
-            $newAllocation = (new RoleSkinAllocation())
+        $postData = $this->request->getParsedBody()["roleToSkinAllocation"];
+
+        foreach ($postData["key"] as $key => $value) {
+            array_push($allocations, (new RoleSkinAllocation())
                 ->setRolId((int) $key)
-                ->setSkinId((string) $value);
-
-            $allocationAlreadyExists = false;
-
-            foreach ($allocations as $allocation) {
-                if ($allocation->getRolId() == $newAllocation->getRolId()) {
-                    $allocationAlreadyExists = true;
-                    break;
-                }
-            }
-            if (!$allocationAlreadyExists) {
-                array_push($allocations, $newAllocation);
-            }
+                ->setSkinId((string) $value));
         }
 
         $this->repository->deleteAll();
