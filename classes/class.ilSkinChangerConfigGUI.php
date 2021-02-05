@@ -57,7 +57,6 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
             $form->handleSubmit();
 
             ilUtil::sendSuccess($this->getPluginObject()->txt("updateSuccessful"), true);
-            $this->ctrl->redirectByClass(ilobjcomponentsettingsgui::class, "view");
         }
 
         $this->tpl->setContent($form->getHTML());
