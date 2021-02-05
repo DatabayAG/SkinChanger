@@ -198,13 +198,12 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     }
 
     /**
-     * Sets the tables header names.
-     * @param $keyName
-     * @param $valueName
-     * @param $actionName
-     * @return ilSelectAllocationInput
+     * @param string $keyName
+     * @param string $valueName
+     * @param string $actionName
+     * @return $this
      */
-    public function setTableHeaders($keyName, $valueName, $actionName) : ilSelectAllocationInput
+    public function setTableHeaders(string $keyName, string $valueName, string $actionName) : ilSelectAllocationInput
     {
         $this->tableHeaders = [
             "key" => htmlspecialchars($keyName),
