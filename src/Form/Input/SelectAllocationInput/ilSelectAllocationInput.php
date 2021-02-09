@@ -152,7 +152,10 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $tpl->setVariable("ACTION_HEADER", $this->tableHeaders["action"]);
 
         if (count($this->options) == 0) {
-            array_push($this->options, [array_keys($this->keyOptions)[0] => array_keys($this->valueOptions)[0]]);
+            array_push(
+                $this->options,
+                [array_keys($this->keyOptions)[0] => array_keys($this->valueOptions)[0]]
+            );
         }
 
         //Fill options array with values from post. Used for example when form is submitted and fails.
@@ -195,8 +198,10 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $a_tpl->setCurrentBlock('prop_generic');
         $a_tpl->setVariable('PROP_GENERIC', $tpl->get());
         $a_tpl->parseCurrentBlock();
-        $this->dic->ui()->mainTemplate()->addJavascript($this->getFolderPath() . 'selectAllocation_input.js');
-        $this->dic->ui()->mainTemplate()->addCSS($this->getFolderPath() . 'selectAllocation_input.css');
+        $this->dic->ui()->mainTemplate()
+                        ->addJavascript($this->getFolderPath() . 'selectAllocation_input.js');
+        $this->dic->ui()->mainTemplate()
+                        ->addCSS($this->getFolderPath() . 'selectAllocation_input.css');
     }
 
     /**

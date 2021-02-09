@@ -34,7 +34,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Returns the instance of the repository to prevent recreation of the whole object.
-     *
      * @param ilDBInterface|null $db
      * @return static
      */
@@ -48,7 +47,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Creates a new row in the role => skin allocation database table.
-     *
      * @param RoleSkinAllocation $allocation
      */
     public function create(RoleSkinAllocation $allocation)
@@ -66,7 +64,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Returns all rows from the role => skin allocation database table.
-     *
      * @return RoleSkinAllocation[]
      */
     public function readAll() : array
@@ -79,7 +76,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Removes a row from the database table by role id.
-     *
      * @param $rolId
      * @return bool
      */
@@ -91,7 +87,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Converts an associative array into an array of RoleSkinAllocation
-     *
      * @param $data
      * @return RoleSkinAllocation[]
      */
@@ -108,7 +103,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Removes all rows from the database table
-     *
      * @return bool
      */
     public function deleteAll() : bool
@@ -119,7 +113,8 @@ class RoleSkinAllocationRepository
 
     public function findSkinByRoleId(int $rol_id)
     {
-        $result = $this->db->query("SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
+        $result = $this->db->query(
+            "SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
         return $this->db->fetchAssoc($result)["skin_id"];
     }
 }

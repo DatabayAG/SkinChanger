@@ -7,4 +7,5 @@ action#:#Aktion
 save#:#Speichern
 updateSuccessful#:#Aktualisierung erfolgreich
 
+selectAllocationInput_count_not_match#:#Anzahl Key Eingabefelder stimmt nicht mit der Anzahl Value Eingabefelder überein
 selectAllocationInput_already_exists#:#Bereits definiert

@@ -7,4 +7,5 @@ action#:#Aktion
 save#:#Save
 updateSuccessful#:#Update successful
 
+selectAllocationInput_count_not_match#:#Number of key input fields does not match number of value input fields.
 selectAllocationInput_already_exists#:#Already defined

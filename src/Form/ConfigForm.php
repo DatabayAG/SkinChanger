@@ -14,6 +14,7 @@ use SkinChanger\Form\Input\SelectAllocationInput\ilSelectAllocationInput;
 use ilStyleDefinition;
 use ilSystemStyleException;
 use Exception;
+use ilSkinChangerConfigGUI;
 
 /**
  * Class ConfigForm
@@ -80,7 +81,7 @@ class ConfigForm extends ilPropertyFormGUI
             ->setInfo($this->plugin->txt("info_roleToSkinInput"));
         $this->addItem($selectAllocationInput);
 
-        $this->setFormAction($this->ctrl->getFormActionByClass(\ilSkinChangerConfigGUI::class, "saveConfiguration"));
+        $this->setFormAction($this->ctrl->getFormActionByClass(ilSkinChangerConfigGUI::class, "saveConfiguration"));
         $this->addCommandButton("saveSettings", $this->plugin->txt("save"));
     }
 
