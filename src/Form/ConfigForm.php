@@ -69,7 +69,6 @@ class ConfigForm extends ilPropertyFormGUI
             "roleToSkinAllocation"
         );
         $selectAllocationInput
-            ->setAllowOnlySingleAllocation(true)
             ->setKeyOptions($roleOptions)
             ->setValueOptions($skinOptions)
             ->setTableHeaders(
