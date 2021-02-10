@@ -5,3 +5,6 @@ role#:#Role
 skin#:#Skin
 save#:#Save
 updateSuccessful#:#Update successful
+cmdNotFound#:#The command was not found in the url
+requestedSkinNotFound#:#Requested skin could not be found
+skinParameterMissingInUrl#:#Skin parameter is missing in url
