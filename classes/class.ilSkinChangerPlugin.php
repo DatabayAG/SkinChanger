@@ -13,7 +13,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
     /**
      * @var int[]
      */
-    private const blacklistedUserIds = [ANONYMOUS_USER_ID];
+    protected const blacklistedUserIds = [ANONYMOUS_USER_ID];
 
     /**
      * @inheritdoc
@@ -105,6 +105,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @param $user
      * @param $skinId
      * @param $styleId
+     * @return void
      */
     public static function setUserSkin($user, $skinId, $styleId)
     {

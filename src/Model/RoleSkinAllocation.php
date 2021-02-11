@@ -10,8 +10,8 @@ namespace SkinChanger\Model;
  */
 class RoleSkinAllocation
 {
-    private int $rol_id = 0;
-    private string $skin_id = "";
+    protected int $rol_id = 0;
+    protected string $skin_id = "";
 
     /**
      * @return int

@@ -16,7 +16,7 @@ class RoleSkinAllocationRepository
 {
     private static ?RoleSkinAllocationRepository $instance = null;
     protected ilDBInterface $db;
-    private string $tablename = 'ui_uihk_skcr_alloc';
+    protected string $tablename = 'ui_uihk_skcr_alloc';
 
     /**
      * RoleSkinAllocationRepository constructor.

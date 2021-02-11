@@ -23,32 +23,32 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    private static $request;
+    protected static $request;
     /**
      * @var Container|mixed
      */
-    private $dic;
+    protected $dic;
 
     /**
      * @var string[]
      */
-    private array $options = [];
+    protected array $options = [];
 
     /**
      * @var string[]
      */
-    private array $keyOptions;
+    protected array $keyOptions;
 
     /**
      * @var string[]
      */
-    private array $valueOptions;
+    protected array $valueOptions;
 
     /**
      * @var string[]
      */
-    private array $tableHeaders = ["key" => "Key", "value" => "Value", "action" => "Action"];
-    private ilPlugin $plugin;
+    protected array $tableHeaders = ["key" => "Key", "value" => "Value", "action" => "Action"];
+    protected ilPlugin $plugin;
 
     /**
      * @var array
@@ -143,6 +143,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      * Inserts the input into the template.
      * @param $a_tpl
      * @throws ilTemplateException
+     * @return void
      */
     public function insert($a_tpl)
     {
@@ -263,7 +264,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      * @param int|string $optionToBeSelected
      * @param string     $blockName
      */
-    private function createOptions(ilTemplate $tpl, array $options, $optionToBeSelected, string $blockName)
+    protected function createOptions(ilTemplate $tpl, array $options, $optionToBeSelected, string $blockName)
     {
         foreach ($options as $key => $value) {
             $tpl->setVariable("OPTION_VALUE", $key);
