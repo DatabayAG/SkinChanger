@@ -14,10 +14,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 {
-    private ilGlobalPageTemplate $tpl;
-    private ilCtrl $ctrl;
-    private RoleSkinAllocationRepository $repository;
-    private HTTPServices $http;
+    protected ilGlobalPageTemplate $tpl;
+    protected ilCtrl $ctrl;
+    protected RoleSkinAllocationRepository $repository;
+    protected HTTPServices $http;
 
     /**
      * ilSkinChangerConfigGUI constructor.
@@ -82,7 +82,7 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
      * Returns the default command
      * @return string
      */
-    private function getDefaultCommand() : string
+    protected function getDefaultCommand() : string
     {
         return "showSettings";
     }

@@ -16,7 +16,7 @@ class RoleSkinAllocationRepository
 {
     private static ?RoleSkinAllocationRepository $instance = null;
     protected ilDBInterface $db;
-    private string $tablename = 'ui_uihk_skcr_alloc';
+    protected string $tablename = 'ui_uihk_skcr_alloc';
 
     /**
      * RoleSkinAllocationRepository constructor.
@@ -90,7 +90,7 @@ class RoleSkinAllocationRepository
      * @param $data
      * @return RoleSkinAllocation[]
      */
-    private function assocArrToObjArr(array $data) : array
+    protected function assocArrToObjArr(array $data) : array
     {
         foreach ($data as $key => $value) {
             $data[$key] = new RoleSkinAllocation();

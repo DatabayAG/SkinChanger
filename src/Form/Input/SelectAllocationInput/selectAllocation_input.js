@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   /**
    * Initializes the existing buttons on page load.
    */
-  const init = (inputClass = '.selectAllocation_input') => {
+  let init = (inputClass = '.selectAllocation_input') => {
     document.querySelectorAll(inputClass + ' .selectAllocation_row').forEach(element => {
       element.querySelector("button[name=add]").addEventListener("click", addRow);
       element.querySelector("button[name=remove]").addEventListener("click", removeRow);
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
    * Adds a new row below the previous one.
    * @param event
    */
-  const addRow = (event) => {
+  let addRow = (event) => {
     let row = event.target.parentNode.parentNode;
     let clone = row.cloneNode(true);
     row.after(clone);
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
    * Removes the row
    * @param event
    */
-  const removeRow = (event) => {
+  let removeRow = (event) => {
     let row = event.target.parentNode.parentNode;
     let rows = row.parentNode.querySelectorAll(".selectAllocation_row");
     if(rows.length > 1){

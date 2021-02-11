@@ -56,7 +56,8 @@ $selectAllocationInput->setOptions(
 
 ##Convert post data into usable key => value pairs.
 ````php
-$keyValuePairs = ilSelectAllocationInput::convertPostToKeyValuePair("postvar");
+$selectAllocationInput = $form->getItemByPostVar("postvar");
+$keyValuePairs = $selectAllocationInput->convertPostToKeyValuePair();
 ````
 This will convert the post data above into:
 ````

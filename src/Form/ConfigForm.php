@@ -23,18 +23,18 @@ use ilSkinChangerConfigGUI;
  */
 class ConfigForm extends ilPropertyFormGUI
 {
-    private ilSkinChangerPlugin $plugin;
-    private ilToolbarGUI $toolbar;
+    protected ilSkinChangerPlugin $plugin;
+    protected ilToolbarGUI $toolbar;
 
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    private $request;
+    protected $request;
 
     /**
      * @var RoleSkinAllocationRepository
      */
-    private RoleSkinAllocationRepository $repository;
+    protected RoleSkinAllocationRepository $repository;
 
     /**
      * ConfigForm constructor.
@@ -98,7 +98,12 @@ class ConfigForm extends ilPropertyFormGUI
          */
         $allocations = [];
 
-        $keyValuePairs = ilSelectAllocationInput::convertPostToKeyValuePair("roleToSkinAllocation");
+        /**
+         * @var ilSelectAllocationInput $selectAllocationInput
+         */
+        $selectAllocationInput = $this->getItemByPostVar("roleToSkinAllocation");
+        $keyValuePairs = $selectAllocationInput->convertPostToKeyValuePair();
+
 
         foreach ($keyValuePairs as $key => $value) {
             array_push($allocations, (new RoleSkinAllocation())
@@ -115,6 +120,7 @@ class ConfigForm extends ilPropertyFormGUI
 
     /**
      * @param RoleSkinAllocation[] $roleSkinAllocations
+     * @return void
      */
     public function bindObject(array $roleSkinAllocations)
     {

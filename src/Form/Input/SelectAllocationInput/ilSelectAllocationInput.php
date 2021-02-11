@@ -23,32 +23,33 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    private static $request;
+    protected $request;
+
     /**
      * @var Container|mixed
      */
-    private $dic;
+    protected $dic;
 
     /**
      * @var string[]
      */
-    private array $options = [];
+    protected array $options = [];
 
     /**
      * @var string[]
      */
-    private array $keyOptions;
+    protected array $keyOptions;
 
     /**
      * @var string[]
      */
-    private array $valueOptions;
+    protected array $valueOptions;
 
     /**
      * @var string[]
      */
-    private array $tableHeaders = ["key" => "Key", "value" => "Value", "action" => "Action"];
-    private ilPlugin $plugin;
+    protected array $tableHeaders = ["key" => "Key", "value" => "Value", "action" => "Action"];
+    protected ilPlugin $plugin;
 
     /**
      * @var array
@@ -67,6 +68,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $this->dic = $DIC;
         $this->lng = $GLOBALS['lng'];
         $this->plugin = $plugin;
+        $this->request = $DIC->http()->request();
         parent::__construct($a_title, $a_postvar);
     }
 
@@ -94,12 +96,12 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      */
     public function setValueByArray($values) : void
     {
-        $keyValuePairs = $values[$this->getPostVar()];
+        $keysAndValues = $values[$this->getPostVar()];
+        $values = $keysAndValues["value"];
 
         $options = [];
-        foreach ($keyValuePairs as $keyValuePair) {
-            array_push($options, [array_keys($keyValuePair)[0] => array_values($keyValuePair)[0]]);
-            //$options[array_keys($keyValuePair)[0]] = array_values($keyValuePair)[0];
+        foreach ($keysAndValues["key"] as $index => $key) {
+            array_push($options, [$key => $values[$index]]);
         }
         $this->options = $options;
     }
@@ -143,6 +145,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      * Inserts the input into the template.
      * @param $a_tpl
      * @throws ilTemplateException
+     * @return void
      */
     public function insert($a_tpl)
     {
@@ -263,7 +266,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      * @param int|string $optionToBeSelected
      * @param string     $blockName
      */
-    private function createOptions(ilTemplate $tpl, array $options, $optionToBeSelected, string $blockName)
+    protected function createOptions(ilTemplate $tpl, array $options, $optionToBeSelected, string $blockName)
     {
         foreach ($options as $key => $value) {
             $tpl->setVariable("OPTION_VALUE", $key);
@@ -285,19 +288,14 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
 
     /**
      * Will convert the post values from the input into key value pairs.
-     * Will also remove duplicate keys keeping the first.
-     * @param string $postVar
+     * Will also remove duplicate keys keeping the first found.
+     * @param string|null $postVar
      * @return string[]|null
      * @throws Exception
      */
-    public static function convertPostToKeyValuePair(string $postVar) : ?array
+    public function convertPostToKeyValuePair(string $postVar = null) : ?array
     {
-        if (!self::$request) {
-            global $DIC;
-            self::$request = $DIC->http()->request();
-        }
-
-        $postData = $requestBody = self::$request->getParsedBody()[$postVar];
+        $postData = $requestBody = $this->request->getParsedBody()[$postVar ? $postVar : $this->getPostVar()];
 
         $convertedKeyValuePairs = [];
         if ($postData) {

@@ -15,16 +15,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 {
-    //rol_id's added to this array will be removed from the selectable allocation roles.
-    private const blacklistedRoles = ["14"];
-    private ilCtrl $ctrl;
-    private ilObjUser $user;
-    private HTTPServices $http;
+    protected ilCtrl $ctrl;
+    protected ilObjUser $user;
+    protected HTTPServices $http;
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    private $request;
-    private ?ilUserInterfaceHookPlugin $plugin;
+    protected $request;
+    protected ?ilSkinChangerPlugin $plugin;
 
     /**
      * ilRepositoryResubmissionUIHookGUI constructor.
@@ -73,8 +71,8 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     }
 
     /**
-     * @throws ilSystemStyleException
      * @return void
+     * @throws ilSystemStyleException
      */
     public function skinChangeThroughLink() : void
     {
@@ -103,12 +101,16 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         if ($this->user->getPref("skinOverride") != $skinId) {
             $this->user->setPref("skinOverride", $skinId);
             $this->user->writePrefs();
-            ilSkinChangerPlugin::setUserSkin($this->user, $skinId, $styleId);
+            $this->plugin->setUserSkin($this->user, $skinId, $styleId);
         }
 
         $this->redirectToDashboard();
     }
 
+    /**
+     * Executes the requested command.
+     * @return void
+     */
     public function executeCommand()
     {
         if (!isset($this->request->getQueryParams()["cmd"])) {
@@ -136,7 +138,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     }
 
     /**
-     * Calls the function for a recieved command
+     * Calls the function for a received command
      * @param $cmd
      * @return void
      */
@@ -160,7 +162,11 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     {
     }
 
-    private function redirectToDashboard()
+    /**
+     * Redirects the user to the dashboard page
+     * @return void
+     */
+    protected function redirectToDashboard()
     {
         $this->ctrl->redirectByClass(ilDashboardGUI::class, "show");
     }
