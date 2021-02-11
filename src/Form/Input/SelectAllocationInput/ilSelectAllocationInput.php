@@ -96,11 +96,12 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
      */
     public function setValueByArray($values) : void
     {
-        $keyValuePairs = $values[$this->getPostVar()];
+        $keysAndValues = $values[$this->getPostVar()];
+        $values = $keysAndValues["value"];
 
         $options = [];
-        foreach ($keyValuePairs as $keyValuePair) {
-            array_push($options, [array_keys($keyValuePair)[0] => array_values($keyValuePair)[0]]);
+        foreach ($keysAndValues["key"] as $index => $key) {
+            array_push($options, [$key => $values[$index]]);
         }
         $this->options = $options;
     }

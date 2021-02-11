@@ -71,8 +71,8 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     }
 
     /**
-     * @throws ilSystemStyleException
      * @return void
+     * @throws ilSystemStyleException
      */
     public function skinChangeThroughLink() : void
     {
