@@ -9,7 +9,7 @@ For example: Administrator => adminSkin.
 The user will get that skin assigned.
 
 If the skin is not available because it has been removed   
-the user will get the default ilias skin and an error message will be shown to the user.
+the user will get the default ilias skin, and an error message will be shown to the user.
 
 It is also possible to use human-readable links like   
 **www.mywebsite.com/databay60** to switch to the **databay60** skin (if available).  

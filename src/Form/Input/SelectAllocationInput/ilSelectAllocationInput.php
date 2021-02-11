@@ -98,9 +98,10 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
 
         $options = [];
         foreach ($keyValuePairs as $keyValuePair) {
-            $options[array_keys($keyValuePair)[0]] = array_values($keyValuePair)[0];
+            array_push($options, [array_keys($keyValuePair)[0] => array_values($keyValuePair)[0]]);
+            //$options[array_keys($keyValuePair)[0]] = array_values($keyValuePair)[0];
         }
-        $this->setOptions($options);
+        $this->options = $options;
     }
 
     /** @inheritDoc */
@@ -173,12 +174,12 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $createdOptionWithError = [];
         foreach ($this->options as $values) {
             $key = array_keys($values)[0];
-            $values = array_values($values)[0];
+            $value = array_values($values)[0];
 
             $tpl->setVariable("POST_VAR", $this->getPostVar());
 
             $this->createOptions($tpl, $this->keyOptions, $key, "keyOption");
-            $this->createOptions($tpl, $this->valueOptions, $values, "valueOption");
+            $this->createOptions($tpl, $this->valueOptions, $value, "valueOption");
 
             $tpl->setVariable("ADD_BUTTON", ilGlyphGUI::get(ilGlyphGUI::ADD));
             $tpl->setVariable("REMOVE_BUTTON", ilGlyphGUI::get(ilGlyphGUI::REMOVE));
