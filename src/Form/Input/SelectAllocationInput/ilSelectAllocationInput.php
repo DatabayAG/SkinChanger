@@ -23,7 +23,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    private $request;
+    protected $request;
 
     /**
      * @var Container|mixed
