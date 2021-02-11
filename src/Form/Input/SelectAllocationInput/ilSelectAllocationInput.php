@@ -97,6 +97,11 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     public function setValueByArray($values) : void
     {
         $keysAndValues = $values[$this->getPostVar()];
+        if (array_keys($keysAndValues) == range(0, count($keysAndValues) - 1)) {
+            $this->options = $keysAndValues;
+            return;
+        }
+
         $values = $keysAndValues["value"];
 
         $options = [];
@@ -144,8 +149,8 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     /**
      * Inserts the input into the template.
      * @param $a_tpl
-     * @throws ilTemplateException
      * @return void
+     * @throws ilTemplateException
      */
     public function insert($a_tpl)
     {
@@ -203,9 +208,9 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $a_tpl->setVariable('PROP_GENERIC', $tpl->get());
         $a_tpl->parseCurrentBlock();
         $this->dic->ui()->mainTemplate()
-                        ->addJavascript($this->getFolderPath() . 'selectAllocation_input.js');
+                  ->addJavascript($this->getFolderPath() . 'selectAllocation_input.js');
         $this->dic->ui()->mainTemplate()
-                        ->addCSS($this->getFolderPath() . 'selectAllocation_input.css');
+                  ->addCSS($this->getFolderPath() . 'selectAllocation_input.css');
     }
 
     /**
