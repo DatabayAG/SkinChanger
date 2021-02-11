@@ -14,19 +14,9 @@ use SkinChanger\Model\RoleSkinAllocation;
  */
 class RoleSkinAllocationRepository
 {
-    /**
-     * @var RoleSkinAllocationRepository
-     */
-    private static $instance;
-    /**
-     * @var ilDBInterface
-     */
-    protected $db;
-
-    /**
-     * @var string
-     */
-    private $tablename = 'ui_uihk_skcr';
+    private static ?RoleSkinAllocationRepository $instance = null;
+    protected ilDBInterface $db;
+    private string $tablename = 'ui_uihk_skcr_alloc';
 
     /**
      * RoleSkinAllocationRepository constructor.
@@ -44,7 +34,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Returns the instance of the repository to prevent recreation of the whole object.
-     *
      * @param ilDBInterface|null $db
      * @return static
      */
@@ -58,21 +47,15 @@ class RoleSkinAllocationRepository
 
     /**
      * Creates a new row in the role => skin allocation database table.
-     *
      * @param RoleSkinAllocation $allocation
      */
     public function create(RoleSkinAllocation $allocation)
     {
-        if (empty($allocation->getId())) {
-            $allocation->setId((int) $this->db->nextId($this->tablename));
-        }
-
         $this->db->manipulateF(
-            "INSERT INTO " . $this->tablename . " (id, rol_id, skin_id) VALUES " .
-            "(%s, %s, %s)",
-            ["integer", "integer", "text"],
+            "INSERT INTO " . $this->tablename . " (rol_id, skin_id) VALUES " .
+            "(%s, %s)",
+            ["integer", "text"],
             [
-                $allocation->getId(),
                 $allocation->getRolId(),
                 $allocation->getSkinId(),
             ]
@@ -81,7 +64,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Returns all rows from the role => skin allocation database table.
-     *
      * @return RoleSkinAllocation[]
      */
     public function readAll() : array
@@ -93,20 +75,18 @@ class RoleSkinAllocationRepository
     }
 
     /**
-     * Removes a row from the database table by id.
-     *
-     * @param $id
+     * Removes a row from the database table by role id.
+     * @param $rolId
      * @return bool
      */
-    public function remove($id) : bool
+    public function remove($rolId) : bool
     {
-        $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename} WHERE id = {$this->db->quote($id, "integer")}");
+        $affected_rows = $this->db->manipulate("DELETE FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rolId, "integer")}");
         return $affected_rows == 1;
     }
 
     /**
      * Converts an associative array into an array of RoleSkinAllocation
-     *
      * @param $data
      * @return RoleSkinAllocation[]
      */
@@ -115,7 +95,6 @@ class RoleSkinAllocationRepository
         foreach ($data as $key => $value) {
             $data[$key] = new RoleSkinAllocation();
             $data[$key]
-                ->setId((int) $value["id"])
                 ->setRolId((int) $value["rol_id"])
                 ->setSkinId((string) $value["skin_id"]);
         }
@@ -124,7 +103,6 @@ class RoleSkinAllocationRepository
 
     /**
      * Removes all rows from the database table
-     *
      * @return bool
      */
     public function deleteAll() : bool
@@ -135,7 +113,8 @@ class RoleSkinAllocationRepository
 
     public function findSkinByRoleId(int $rol_id)
     {
-        $result = $this->db->query("SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
+        $result = $this->db->query(
+            "SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
         return $this->db->fetchAssoc($result)["skin_id"];
     }
 }

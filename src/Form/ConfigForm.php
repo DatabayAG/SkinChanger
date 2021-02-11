@@ -10,6 +10,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use SkinChanger\Repository\RoleSkinAllocationRepository;
 use SkinChanger\Model\RoleSkinAllocation;
+use SkinChanger\Form\Input\SelectAllocationInput\ilSelectAllocationInput;
+use ilStyleDefinition;
+use ilSystemStyleException;
+use Exception;
 use ilSkinChangerConfigGUI;
 
 /**
@@ -21,15 +25,22 @@ class ConfigForm extends ilPropertyFormGUI
 {
     private ilSkinChangerPlugin $plugin;
     private ilToolbarGUI $toolbar;
+
     /**
      * @var RequestInterface|ServerRequestInterface
      */
     private $request;
+
     /**
      * @var RoleSkinAllocationRepository
      */
     private RoleSkinAllocationRepository $repository;
 
+    /**
+     * ConfigForm constructor.
+     * @param ilSkinChangerPlugin $plugin
+     * @throws ilSystemStyleException
+     */
     public function __construct(ilSkinChangerPlugin $plugin)
     {
         global $DIC;
@@ -43,76 +54,77 @@ class ConfigForm extends ilPropertyFormGUI
 
         $this->setTitle($plugin->txt("ui_uihk_skinchanger_config"));
 
-        $rows = new \ilKVPWizardInputGUI("", "rows");
-        $rows->setRequired(true);
-        $rows->setTitle($this->plugin->txt("roleToSkinInput"));
-        $rows->setKeyName($this->plugin->txt("role"));
-        $rows->setValueName($this->plugin->txt("skin"));
-        $rows->setInfo($this->plugin->txt("info_roleToSkinInput"));
-
-        $numberOfAllocations = count($this->repository->readAll());
-
-        //Gets overridden by javascript code that replaces <input> elements with <select> elements
-        //Only used to define how many rows the allocation table has.
-        $allocations = [];
-        for ($i = 0; $i < $numberOfAllocations; $i++) {
-            $allocations[$i . "_key"] = $i . "_value";
-        }
-        if ($numberOfAllocations < 1) {
-            $allocations[$numberOfAllocations . "_key"] = $numberOfAllocations . "_value";
+        $roleOptions = [];
+        foreach ($DIC->rbac()->review()->getAssignableRoles() as $role) {
+            $roleOptions[$role["rol_id"]] = $role["title"];
         }
 
-        $rows->setValues($allocations);
-        $this->addItem($rows);
+        $skinOptions = [];
+        foreach (ilStyleDefinition::getAllSkinStyles() as $style) {
+            $skinOptions[$style["skin_id"]] = $style["skin_name"];
+        }
 
-        $ajaxAllocationsUrl = new \ilHiddenInputGUI("ajax_allocations_url");
-        $ajaxAllocationsUrl->setValue(
-            $this->ctrl->getLinkTargetByClass(
-                ilSkinChangerConfigGUI::class,
-                "ajax_allocations",
-                "",
-                true
-            )
+        $selectAllocationInput = new ilSelectAllocationInput(
+            $plugin,
+            $this->plugin->txt("roleToSkinInput"),
+            "roleToSkinAllocation"
         );
-        $this->addItem($ajaxAllocationsUrl);
+        $selectAllocationInput
+            ->setKeyOptions($roleOptions)
+            ->setValueOptions($skinOptions)
+            ->setTableHeaders(
+                $this->plugin->txt("role"),
+                $this->plugin->txt("skin"),
+                $this->plugin->txt("action")
+            )
+            ->setRequired(true)
+            ->setInfo($this->plugin->txt("info_roleToSkinInput"));
+        $this->addItem($selectAllocationInput);
 
-        $this->setFormAction($this->ctrl->getFormActionByClass(\ilSkinChangerConfigGUI::class, "saveConfiguration"));
-
+        $this->setFormAction($this->ctrl->getFormActionByClass(ilSkinChangerConfigGUI::class, "saveConfiguration"));
         $this->addCommandButton("saveSettings", $this->plugin->txt("save"));
-        $this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/js/kvpWizardHandler.js');
     }
 
-    public function handleSubmit()
+    /**
+     * Handles the form submit.
+     * @return void
+     * @throws Exception
+     */
+    public function handleSubmit() : void
     {
-        $requestBody = $this->request->getParsedBody();
-
-        $rows = $requestBody["rows"];
 
         /**
          * @var $allocations RoleSkinAllocation[]
          */
         $allocations = [];
-        for ($i = 0; $i < count($rows["key"]); $i++) {
-            $newAllocation = (new RoleSkinAllocation())
-                ->setRolId((int) $rows["key"][$i])
-                ->setSkinId((string) $rows["value"][$i]);
 
-            $allocationAlreadyExists = false;
+        $postData = $this->request->getParsedBody()["roleToSkinAllocation"];
 
-            foreach ($allocations as $allocation) {
-                if ($allocation->getRolId() == $newAllocation->getRolId()) {
-                    $allocationAlreadyExists = true;
-                    break;
-                }
-            }
-            if (!$allocationAlreadyExists) {
-                $allocations[$i] = $newAllocation;
-            }
+        foreach ($postData["key"] as $key => $value) {
+            array_push($allocations, (new RoleSkinAllocation())
+                ->setRolId((int) $key)
+                ->setSkinId((string) $value));
         }
+
         $this->repository->deleteAll();
 
         foreach ($allocations as $allocation) {
             $this->repository->create($allocation);
         }
+    }
+
+    /**
+     * @param RoleSkinAllocation[] $roleSkinAllocations
+     */
+    public function bindObject(array $roleSkinAllocations)
+    {
+        $keyValuePairs = [];
+        foreach ($roleSkinAllocations as $allocation) {
+            array_push($keyValuePairs, [$allocation->getRolId() => $allocation->getSkinId()]);
+        }
+        $values = [
+            "roleToSkinAllocation" => $keyValuePairs
+        ];
+        $this->setValuesByArray($values, true);
     }
 }

@@ -11,6 +11,11 @@ use SkinChanger\Repository\RoleSkinAllocationRepository;
 class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 {
     /**
+     * @var int[]
+     */
+    private const blacklistedUserIds = [ANONYMOUS_USER_ID];
+
+    /**
      * @inheritdoc
      */
     public function getPluginName() : string
@@ -41,6 +46,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         $styleId = "";
 
         $assignedRoles = $review->assignedRoles($user->getId());
+
+        foreach (self::blacklistedUserIds as $userId) {
+            if ($user->getId() == $userId) {
+                return;
+            }
+        }
 
         foreach ($assignedRoles as $assignedRole) {
             $assignedSkin = $repository->findSkinByRoleId((int) $assignedRole);
@@ -79,8 +90,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     public static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
     {
-        $skinOverride = $user->getPref("skinOverride");
-        if ($skinOverride) {
+        if (($skinOverride = $user->getPref("skinOverride"))) {
             foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
                 if ($availableStyle["skin_id"] == $skinOverride) {
                     return ["skinId" => $skinOverride, "styleId" => $availableStyle["style_id"]];
@@ -112,12 +122,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
     protected function beforeUninstall() : bool
     {
         global $DIC;
-
-        if ($DIC->database()->tableExists('ui_uihk_skcr')) {
-            $DIC->database()->dropTable('ui_uihk_skcr');
+        $database = $DIC->database();
+        if ($database->tableExists('ui_uihk_skcr')) {
+            $database->dropTable('ui_uihk_skcr');
         }
-        if ($DIC->database()->sequenceExists("ui_uihk_skcr")) {
-            $DIC->database()->dropSequence("ui_uihk_skcr");
+        if ($database->tableExists("ui_uihk_skcr_alloc")) {
+            $database->dropTable("ui_uihk_skcr_alloc");
         }
 
         return parent::beforeUninstall();
