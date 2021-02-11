@@ -22,7 +22,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
      * @var RequestInterface|ServerRequestInterface
      */
     protected $request;
-    protected ?ilUserInterfaceHookPlugin $plugin;
+    protected ?ilSkinChangerPlugin $plugin;
 
     /**
      * ilRepositoryResubmissionUIHookGUI constructor.
@@ -101,7 +101,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         if ($this->user->getPref("skinOverride") != $skinId) {
             $this->user->setPref("skinOverride", $skinId);
             $this->user->writePrefs();
-            ilSkinChangerPlugin::setUserSkin($this->user, $skinId, $styleId);
+            $this->plugin->setUserSkin($this->user, $skinId, $styleId);
         }
 
         $this->redirectToDashboard();

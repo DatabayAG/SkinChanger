@@ -23,7 +23,8 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     /**
      * @var RequestInterface|ServerRequestInterface
      */
-    protected static $request;
+    private $request;
+
     /**
      * @var Container|mixed
      */
@@ -67,6 +68,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $this->dic = $DIC;
         $this->lng = $GLOBALS['lng'];
         $this->plugin = $plugin;
+        $this->request = $DIC->http()->request();
         parent::__construct($a_title, $a_postvar);
     }
 
@@ -99,7 +101,6 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         $options = [];
         foreach ($keyValuePairs as $keyValuePair) {
             array_push($options, [array_keys($keyValuePair)[0] => array_values($keyValuePair)[0]]);
-            //$options[array_keys($keyValuePair)[0]] = array_values($keyValuePair)[0];
         }
         $this->options = $options;
     }
@@ -286,19 +287,14 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
 
     /**
      * Will convert the post values from the input into key value pairs.
-     * Will also remove duplicate keys keeping the first.
-     * @param string $postVar
+     * Will also remove duplicate keys keeping the first found.
+     * @param string|null $postVar
      * @return string[]|null
      * @throws Exception
      */
-    public static function convertPostToKeyValuePair(string $postVar) : ?array
+    public function convertPostToKeyValuePair(string $postVar = null) : ?array
     {
-        if (!self::$request) {
-            global $DIC;
-            self::$request = $DIC->http()->request();
-        }
-
-        $postData = $requestBody = self::$request->getParsedBody()[$postVar];
+        $postData = $requestBody = $this->request->getParsedBody()[$postVar ? $postVar : $this->getPostVar()];
 
         $convertedKeyValuePairs = [];
         if ($postData) {

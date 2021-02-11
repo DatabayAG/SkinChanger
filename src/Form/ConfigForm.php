@@ -98,7 +98,12 @@ class ConfigForm extends ilPropertyFormGUI
          */
         $allocations = [];
 
-        $keyValuePairs = ilSelectAllocationInput::convertPostToKeyValuePair("roleToSkinAllocation");
+        /**
+         * @var ilSelectAllocationInput $selectAllocationInput
+         */
+        $selectAllocationInput = $this->getItemByPostVar("roleToSkinAllocation");
+        $keyValuePairs = $selectAllocationInput->convertPostToKeyValuePair();
+
 
         foreach ($keyValuePairs as $key => $value) {
             array_push($allocations, (new RoleSkinAllocation())
