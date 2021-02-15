@@ -97,6 +97,9 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
     public function setValueByArray($values) : void
     {
         $keysAndValues = $values[$this->getPostVar()];
+        if (!$keysAndValues) {
+            return;
+        }
         if (array_keys($keysAndValues) == range(0, count($keysAndValues) - 1)) {
             $this->options = $keysAndValues;
             return;
@@ -119,6 +122,7 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
         if (isset($post[$this->getPostVar()]) && is_array($post[$this->getPostVar()])) {
             $keys = $post[$this->getPostVar()]["key"];
             $values = $post[$this->getPostVar()]["value"];
+
             if (count($keys) != count($values)) {
                 $this->setAlert($this->plugin->txt("selectAllocationInput_count_not_match"));
                 return false;
@@ -136,11 +140,12 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
                 }
             }
         } elseif ($this->getRequired()) {
-            $this->setAlert('');
+            $this->setAlert($this->plugin->txt("selectAllocationInput_form_invalid"));
             return false;
         }
 
         if (count($this->errors)) {
+            $this->setAlert($this->plugin->txt("selectAllocationInput_form_invalid"));
             return false;
         }
         return true;

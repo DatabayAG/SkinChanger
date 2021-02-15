@@ -10,5 +10,6 @@ cmdNotFound#:#The command was not found in the url
 requestedSkinNotFound#:#Requested skin could not be found
 skinParameterMissingInUrl#:#Skin parameter is missing in url
 
-selectAllocationInput_count_not_match#:#Number of key input fields does not match number of value input fields.
+selectAllocationInput_count_not_match#:#Number of key input fields does not match number of value input fields
 selectAllocationInput_already_exists#:#Already defined
+selectAllocationInput_form_invalid#:#The form is invalid

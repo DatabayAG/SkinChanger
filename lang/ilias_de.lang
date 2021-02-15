@@ -12,3 +12,4 @@ skinParameterMissingInUrl#:#Skin Parameter fehlt in der url
 
 selectAllocationInput_count_not_match#:#Anzahl Key Eingabefelder stimmt nicht mit der Anzahl Value Eingabefelder überein
 selectAllocationInput_already_exists#:#Bereits definiert
+selectAllocationInput_form_invalid#:#Das Formular ist fehlerhaft
