@@ -12,6 +12,9 @@ if (!$ilDB->tableExists("ui_uihk_skcr")) {
     ]);
     $ilDB->addPrimaryKey("ui_uihk_skcr", ["id"]);
 }
+?>
+<#2>
+<?php
 if (!$ilDB->tableExists("ui_uihk_skcr_alloc")) {
     $ilDB->createTable("ui_uihk_skcr_alloc", [
         'rol_id' => [
