@@ -9,7 +9,7 @@ For example: Administrator => adminSkin.
 The user will get that skin assigned.
 
 If the skin is not available because it has been removed   
-the user will get the default ilias skin and an error message will be shown to the user.
+the user will get the default ilias skin, and an error message will be shown to the user.
 
 It is also possible to use human-readable links like   
 **www.mywebsite.com/databay60** to switch to the **databay60** skin (if available).  
@@ -31,6 +31,17 @@ This will also override the skin that was defined by allocating the users role w
 6. Choose **Activate** from the **Actions** dropdown.
 7. Choose **Configure** from the **Actions** dropdown to allocate roles with skins.  
 The allocation table will only show available skins that were installed like described below.
+
+##Nginx setup
+The following line is required to allow changing/overriding the skin using a readable link.  
+It has to be added to your servers config file (usually under /etc/nginx/sites-available).
+````regexp
+rewrite \/([A-Za-z0-9-_]+)$ /goto.php?target=skinChangeThroughLink&skin=$1 redirect;
+````
+Supported skin names can be changed/modified by changing the regex below.
+````regexp
+\/([A-Za-z0-9-_]+)$
+````
 
 ## Skin installation
 Place the skins folder into the folder located at **Customizing/global/skin/**  

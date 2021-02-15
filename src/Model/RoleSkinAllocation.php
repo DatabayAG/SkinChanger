@@ -10,30 +10,8 @@ namespace SkinChanger\Model;
  */
 class RoleSkinAllocation
 {
-    /**
-     * @var int|null
-     */
-    private ?int $id = null;
-    private int $rol_id = 0;
-    private string $skin_id = "";
-
-    /**
-     * @return int|null
-     */
-    public function getId() : ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int|null $id
-     * @return RoleSkinAllocation
-     */
-    public function setId(?int $id) : RoleSkinAllocation
-    {
-        $this->id = $id;
-        return $this;
-    }
+    protected int $rol_id = 0;
+    protected string $skin_id = "";
 
     /**
      * @return int

@@ -3,5 +3,13 @@ roleToSkinInput#:#Rolle zu Skin Zuweisung
 info_roleToSkinInput#:#Benutzer mit der Rolle (Links) erhalten beim einloggen den Skin (Rechts) zugewiesen.<br>Höhere Zuweisungen überschreiben Zuweisungen unter ihnen.
 role#:#Rolle
 skin#:#Skin
+action#:#Aktion
 save#:#Speichern
 updateSuccessful#:#Aktualisierung erfolgreich
+cmdNotFound#:#Das command wurde nicht in der url gefunden
+requestedSkinNotFound#:#Angeforderter skin wurde nicht gefunden
+skinParameterMissingInUrl#:#Skin Parameter fehlt in der url
+
+selectAllocationInput_count_not_match#:#Anzahl Key Eingabefelder stimmt nicht mit der Anzahl Value Eingabefelder überein
+selectAllocationInput_already_exists#:#Bereits definiert
+selectAllocationInput_form_invalid#:#Das Formular ist fehlerhaft

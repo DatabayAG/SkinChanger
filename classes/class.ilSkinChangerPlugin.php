@@ -11,6 +11,11 @@ use SkinChanger\Repository\RoleSkinAllocationRepository;
 class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 {
     /**
+     * @var int[]
+     */
+    protected const blacklistedUserIds = [ANONYMOUS_USER_ID];
+
+    /**
      * @inheritdoc
      */
     public function getPluginName() : string
@@ -26,7 +31,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @return void
      * @throws ilSystemStyleException
      */
-    public static function handleEvent($a_component, $a_event, $a_parameter) : void
+    public function handleEvent($a_component, $a_event, $a_parameter) : void
     {
         if ($a_event != "afterLogin") {
             return;
@@ -41,6 +46,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         $styleId = "";
 
         $assignedRoles = $review->assignedRoles($user->getId());
+
+        foreach (self::blacklistedUserIds as $userId) {
+            if ($user->getId() == $userId) {
+                return;
+            }
+        }
 
         foreach ($assignedRoles as $assignedRole) {
             $assignedSkin = $repository->findSkinByRoleId((int) $assignedRole);
@@ -62,12 +73,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         }
 
         //Checks if user changed his skin using the override link and if so changes the users skin to the defined override one.
-        if (self::checkUserHasOverriddenSkin($user)) {
-            self::setUserSkin($user, $override["skinId"], $override["styleId"]);
+        if (($override = $this->checkUserHasOverriddenSkin($user))) {
+            $this->setUserSkin($user, $override["skinId"], $override["styleId"]);
             return;
         }
 
-        self::setUserSkin($user, $skinId, $styleId);
+        $this->setUserSkin($user, $skinId, $styleId);
     }
 
     /**
@@ -77,10 +88,9 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @return string[]|null
      * @throws ilSystemStyleException
      */
-    private static function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
+    public function checkUserHasOverriddenSkin(ilObjUser $user) : ?array
     {
-        $skinOverride = $user->getPref("skinOverride");
-        if ($skinOverride) {
+        if (($skinOverride = $user->getPref("skinOverride"))) {
             foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
                 if ($availableStyle["skin_id"] == $skinOverride) {
                     return ["skinId" => $skinOverride, "styleId" => $availableStyle["style_id"]];
@@ -95,8 +105,9 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @param $user
      * @param $skinId
      * @param $styleId
+     * @return void
      */
-    protected static function setUserSkin($user, $skinId, $styleId)
+    public function setUserSkin($user, $skinId, $styleId)
     {
         if ($user->getPref("skin") != $skinId || $user->getPref("style") != $styleId) {
             $user->setPref("skin", $skinId);
@@ -112,12 +123,12 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
     protected function beforeUninstall() : bool
     {
         global $DIC;
-
-        if ($DIC->database()->tableExists('ui_uihk_skcr')) {
-            $DIC->database()->dropTable('ui_uihk_skcr');
+        $database = $DIC->database();
+        if ($database->tableExists('ui_uihk_skcr')) {
+            $database->dropTable('ui_uihk_skcr');
         }
-        if ($DIC->database()->sequenceExists("ui_uihk_skcr")) {
-            $DIC->database()->dropSequence("ui_uihk_skcr");
+        if ($database->tableExists("ui_uihk_skcr_alloc")) {
+            $database->dropTable("ui_uihk_skcr_alloc");
         }
 
         return parent::beforeUninstall();
