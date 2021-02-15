@@ -1,3 +1,4 @@
 /vendor/
 /phpCsFixer_fixSrcAndClasses.sh
 /composer.lock
+/.idea/
