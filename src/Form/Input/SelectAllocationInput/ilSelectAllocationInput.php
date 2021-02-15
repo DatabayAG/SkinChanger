@@ -123,6 +123,11 @@ class ilSelectAllocationInput extends ilFormPropertyGUI
             $keys = $post[$this->getPostVar()]["key"];
             $values = $post[$this->getPostVar()]["value"];
 
+            if (!$keys || !$values) {
+                $this->setAlert($this->plugin->txt("selectAllocationInput_form_invalid"));
+                return false;
+            }
+
             if (count($keys) != count($values)) {
                 $this->setAlert($this->plugin->txt("selectAllocationInput_count_not_match"));
                 return false;
