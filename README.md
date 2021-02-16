@@ -2,7 +2,7 @@
 
 ILIAS Plugin for allocating roles to a skin.
 
-##What does this plugin do?
+## What does this plugin do?
 This plugin makes it possible to allocate a role with a skin.  
 When a user logs in and has a role that was allocated to a skin.  
 For example: Administrator => adminSkin.  
@@ -32,7 +32,7 @@ This will also override the skin that was defined by allocating the users role w
 7. Choose **Configure** from the **Actions** dropdown to allocate roles with skins.  
 The allocation table will only show available skins that were installed like described below.
 
-##Nginx setup
+## Nginx setup
 The following line is required to allow changing/overriding the skin using a readable link.  
 It has to be added to your servers config file (usually under /etc/nginx/sites-available).
 ````regexp
