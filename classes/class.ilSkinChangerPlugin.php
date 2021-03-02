@@ -4,8 +4,6 @@
 
 use SkinChanger\Repository\RoleSkinAllocationRepository;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
 /**
  * Class ilSkinChangerPlugin
  * @author  Marvin Beym <mbeym@databay.de>
@@ -35,7 +33,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     public function handleEvent($a_component, $a_event, $a_parameter) : void
     {
-        if ($a_event != "afterLogin") {
+        if ($a_event != "afterLogin" || PHP_SAPI === 'cli') {
             return;
         }
 
