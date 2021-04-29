@@ -6,10 +6,10 @@
  */
 $id = "skcr";
 
-$version = "1.0.0";
+$version = "1.0.1";
 
 $ilias_min_version = "6.0";
-$ilias_max_version = "6.999";
+$ilias_max_version = "7.999";
 
 $responsible = "Marvin Beym";
 $responsible_mail = "mbeym@databay.de";
