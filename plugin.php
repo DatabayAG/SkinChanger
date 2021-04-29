@@ -6,7 +6,7 @@
  */
 $id = "skcr";
 
-$version = "1.0.0";
+$version = "1.0.1";
 
 $ilias_min_version = "6.0";
 $ilias_max_version = "7.999";
