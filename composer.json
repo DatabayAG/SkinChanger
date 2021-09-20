@@ -16,5 +16,8 @@
     "psr-4": {
       "SkinChanger\\": "src/"
     }
+  },
+  "config": {
+    "classmap-authoritative": true
   }
 }
