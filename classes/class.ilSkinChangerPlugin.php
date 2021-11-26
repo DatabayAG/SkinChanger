@@ -10,17 +10,45 @@ use SkinChanger\Repository\RoleSkinAllocationRepository;
  */
 class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 {
+    /** @var string */
+    public const CTYPE = "Services";
+    /** @var string */
+    public const CNAME = "UIComponent";
+    /** @var string */
+    public const SLOT_ID = "uihk";
+    /** @var string */
+    public const PNAME = "SkinChanger";
+
     /**
      * @var int[]
      */
     protected const blacklistedUserIds = [ANONYMOUS_USER_ID];
 
     /**
+     * @var ilSkinChangerPlugin|null
+     */
+    private static $instance = null;
+
+    /**
      * @inheritdoc
      */
     public function getPluginName() : string
     {
-        return "SkinChanger";
+        return self::PNAME;
+    }
+
+    /**
+     * @return ilSkinChangerPlugin
+     * @noinspection PhpIncompatibleReturnTypeInspection
+     */
+    public static function getInstance() : ilSkinChangerPlugin
+    {
+        return self::$instance ?? (self::$instance = ilPluginAdmin::getPluginObject(
+            self::CTYPE,
+            self::CNAME,
+            self::SLOT_ID,
+            self::PNAME
+        ));
     }
 
     /**

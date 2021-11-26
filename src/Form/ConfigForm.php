@@ -38,21 +38,20 @@ class ConfigForm extends ilPropertyFormGUI
 
     /**
      * ConfigForm constructor.
-     * @param ilSkinChangerPlugin $plugin
      * @throws ilSystemStyleException
      */
-    public function __construct(ilSkinChangerPlugin $plugin)
+    public function __construct()
     {
         global $DIC;
         parent::__construct();
 
         $this->request = $DIC->http()->request();
         $this->tpl = $DIC->ui()->mainTemplate();
-        $this->plugin = $plugin;
+        $this->plugin = ilSkinChangerPlugin::getInstance();
         $this->toolbar = $DIC->toolbar();
         $this->repository = RoleSkinAllocationRepository::getInstance();
 
-        $this->setTitle($plugin->txt("ui_uihk_skinchanger_config"));
+        $this->setTitle($this->plugin->txt("ui_uihk_skinchanger_config"));
 
         $roleOptions = [];
         foreach ($DIC->rbac()->review()->getAssignableRoles() as $role) {
@@ -65,7 +64,7 @@ class ConfigForm extends ilPropertyFormGUI
         }
 
         $selectAllocationInput = new ilSelectAllocationInput(
-            $plugin,
+            $this->plugin,
             $this->plugin->txt("roleToSkinInput"),
             "roleToSkinAllocation"
         );
@@ -106,9 +105,9 @@ class ConfigForm extends ilPropertyFormGUI
 
 
         foreach ($keyValuePairs as $key => $value) {
-            array_push($allocations, (new RoleSkinAllocation())
+            $allocations[] = (new RoleSkinAllocation())
                 ->setRolId((int) $key)
-                ->setSkinId((string) $value));
+                ->setSkinId((string) $value);
         }
 
         $this->repository->deleteAll();
