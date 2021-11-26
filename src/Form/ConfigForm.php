@@ -15,6 +15,7 @@ use ilStyleDefinition;
 use ilSystemStyleException;
 use Exception;
 use ilSkinChangerConfigGUI;
+use ilCheckboxInputGUI;
 
 /**
  * Class ConfigForm
@@ -52,6 +53,13 @@ class ConfigForm extends ilPropertyFormGUI
         $this->repository = RoleSkinAllocationRepository::getInstance();
 
         $this->setTitle($this->plugin->txt("ui_uihk_skinchanger_config"));
+
+        $enableAnonSkinChangeInput = new ilCheckboxInputGUI(
+            $this->plugin->txt("enableAnonSkinChange"),
+            "enableAnonSkinChange"
+        );
+        $enableAnonSkinChangeInput->setInfo($this->plugin->txt("enableAnonSkinChange_info"));
+        $this->addItem($enableAnonSkinChangeInput);
 
         $roleOptions = [];
         foreach ($DIC->rbac()->review()->getAssignableRoles() as $role) {
@@ -97,6 +105,8 @@ class ConfigForm extends ilPropertyFormGUI
          */
         $allocations = [];
 
+        $this->settings->set("enableAnonSkinChange", (bool) $this->getInput("enableAnonSkinChange"));
+
         /**
          * @var ilSelectAllocationInput $selectAllocationInput
          */
@@ -128,7 +138,8 @@ class ConfigForm extends ilPropertyFormGUI
             array_push($keyValuePairs, [$allocation->getRolId() => $allocation->getSkinId()]);
         }
         $values = [
-            "roleToSkinAllocation" => $keyValuePairs
+            "roleToSkinAllocation" => $keyValuePairs,
+            "enableAnonSkinChange" => (bool) $this->settings->get("enableAnonSkinChange", false)
         ];
         $this->setValuesByArray($values, true);
     }

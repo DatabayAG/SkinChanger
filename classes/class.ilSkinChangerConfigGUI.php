@@ -14,6 +14,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerConfigGUI extends ilPluginConfigGUI
 {
+    private ilSkinChangerPlugin $plugin;
     protected ilGlobalPageTemplate $tpl;
     protected ilCtrl $ctrl;
     protected RoleSkinAllocationRepository $repository;
@@ -26,6 +27,7 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
         $this->tpl = $DIC->ui()->mainTemplate();
+        $this->plugin = ilSkinChangerPlugin::getInstance();
         $this->repository = RoleSkinAllocationRepository::getInstance();
         $this->http = $DIC->http();
         $this->ctrl = $DIC->ctrl();
@@ -34,12 +36,11 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
     /**
      * Shows the plugin configuration
      * @return void
-     * @throws ilPluginException|ilSystemStyleException
      */
     public function showSettings()
     {
         /** @var ilSkinChangerPlugin $this */
-        $form = new ConfigForm($this->getPluginObject());
+        $form = new ConfigForm();
         $form->bindObject($this->repository->readAll());
         $this->tpl->setContent($form->getHTML());
     }
@@ -51,12 +52,12 @@ class ilSkinChangerConfigGUI extends ilPluginConfigGUI
      */
     public function saveSettings() : void
     {
-        $form = new ConfigForm($this->getPluginObject());
+        $form = new ConfigForm();
         $form->setValuesByPost();
         if ($form->checkInput()) {
             $form->handleSubmit();
 
-            ilUtil::sendSuccess($this->getPluginObject()->txt("updateSuccessful"), true);
+            ilUtil::sendSuccess($this->plugin->txt("updateSuccessful"), true);
         }
 
         $this->tpl->setContent($form->getHTML());

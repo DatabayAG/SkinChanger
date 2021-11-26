@@ -28,6 +28,13 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @var ilSkinChangerPlugin|null
      */
     private static $instance = null;
+    private ilSetting $settings;
+
+    public function __construct()
+    {
+        $this->settings = new ilSetting(self::class);
+        parent::__construct();
+    }
 
     /**
      * @inheritdoc
@@ -158,7 +165,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         if ($database->tableExists("ui_uihk_skcr_alloc")) {
             $database->dropTable("ui_uihk_skcr_alloc");
         }
-
+        $this->settings->deleteAll();
         return parent::beforeUninstall();
     }
 }
