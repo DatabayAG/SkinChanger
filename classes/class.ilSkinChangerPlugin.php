@@ -135,6 +135,31 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         return null;
     }
 
+    public function assetsFolder(string $file = "") : string
+    {
+        return $this->getDirectory() . "/assets/$file";
+    }
+
+    public function cssFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("css/$file");
+    }
+
+    public function imagesFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("images/$file");
+    }
+
+    public function templatesFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("templates/$file");
+    }
+
+    public function jsFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("js/$file");
+    }
+
     /**
      * Sets the user skin and checks if the skin is already the desired skin.
      * @param ilObjUser $user
