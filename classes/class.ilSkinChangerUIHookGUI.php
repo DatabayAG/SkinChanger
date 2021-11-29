@@ -247,11 +247,15 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         $currentCssPath .= "$currentSkin/$currentStyle.css";
         $newCssPath .= "$skinId/$styleId.css";
 
-        if ($currentCssPath === $newCssPath) {
-            return $this->uiHookResponse();
+        if ($currentCssPath !== $newCssPath) {
+            $html = str_replace($currentCssPath, $newCssPath, $html);
         }
 
-        $html = str_replace($currentCssPath, $newCssPath, $html);
+        $html = str_replace(
+            "</head>",
+            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script></head>",
+            $html
+        );
 
         return $this->uiHookResponse(self::REPLACE, $html);
     }
