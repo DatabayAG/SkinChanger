@@ -16,6 +16,7 @@ use ilSystemStyleException;
 use Exception;
 use ilSkinChangerConfigGUI;
 use ilCheckboxInputGUI;
+use ilTextInputGUI;
 
 /**
  * Class ConfigForm
@@ -60,6 +61,13 @@ class ConfigForm extends ilPropertyFormGUI
         );
         $enableAnonSkinChangeInput->setInfo($this->plugin->txt("enableAnonSkinChange_info"));
         $this->addItem($enableAnonSkinChangeInput);
+
+        $anonSkinChangeUrlCleanerSuffix = new ilTextInputGUI(
+            $this->plugin->txt("anonSkinChangeUrlCleanerSuffix"),
+            "anonSkinChangeUrlCleanerSuffix"
+        );
+        $anonSkinChangeUrlCleanerSuffix->setInfo($this->plugin->txt("anonSkinChangeUrlCleanerSuffix_info"));
+        $enableAnonSkinChangeInput->addSubItem($anonSkinChangeUrlCleanerSuffix);
 
         $enableAfterLoginSkinAllocation = new ilCheckboxInputGUI(
             $this->plugin->txt("enableAfterLoginSkinAllocation"),
@@ -118,6 +126,10 @@ class ConfigForm extends ilPropertyFormGUI
             "enableAfterLoginSkinAllocation",
             (bool) $this->getInput("enableAfterLoginSkinAllocation")
         );
+        $this->plugin->settings->set(
+            "anonSkinChangeUrlCleanerSuffix",
+            $this->getInput("anonSkinChangeUrlCleanerSuffix")
+        );
 
         /**
          * @var ilSelectAllocationInput $selectAllocationInput
@@ -154,7 +166,8 @@ class ConfigForm extends ilPropertyFormGUI
             "enableAfterLoginSkinAllocation" => (bool) $this->plugin->settings->get(
                 "enableAfterLoginSkinAllocation",
                 true
-            )
+            ),
+            "anonSkinChangeUrlCleanerSuffix" => $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "")
         ];
         $this->setValuesByArray($values, true);
     }

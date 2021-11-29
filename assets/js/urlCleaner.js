@@ -6,13 +6,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let clearUrl = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let anonSkinId = urlParams.get("anonSkinId");
-    let anonStyleId = urlParams.get("anonStyleId");
+    let skinChangeTempUrlCleaner = document.querySelector("#skinChange_temp_urlCleaner");
 
-    if(!anonSkinId || !anonStyleId) {
+    if(!anonSkinId || !skinChangeTempUrlCleaner) {
       return;
     }
 
-    window.history.replaceState(null, '', anonSkinId === "default" ? "login.php" : `${anonSkinId}.html`);
+    let suffix = skinChangeTempUrlCleaner.textContent;
+    skinChangeTempUrlCleaner.remove();
+    window.history.replaceState(null, '', anonSkinId === "default" ? "login.php" : `${anonSkinId}.${suffix}`);
   }
 
   init();

@@ -251,9 +251,11 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
             $html = str_replace($currentCssPath, $newCssPath, $html);
         }
 
+        $anonSkinChangeUrlCleanerSuffix = $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "");
+
         $html = str_replace(
             "</head>",
-            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script></head>",
+            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
             $html
         );
 
