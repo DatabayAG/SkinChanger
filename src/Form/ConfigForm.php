@@ -114,14 +114,16 @@ class ConfigForm extends ilPropertyFormGUI
         $allocations = [];
 
         $this->plugin->settings->set("enableAnonSkinChange", (bool) $this->getInput("enableAnonSkinChange"));
-        $this->plugin->settings->set("enableAfterLoginSkinAllocation", (bool) $this->getInput("enableAfterLoginSkinAllocation"));
+        $this->plugin->settings->set(
+            "enableAfterLoginSkinAllocation",
+            (bool) $this->getInput("enableAfterLoginSkinAllocation")
+        );
 
         /**
          * @var ilSelectAllocationInput $selectAllocationInput
          */
         $selectAllocationInput = $this->getItemByPostVar("roleToSkinAllocation");
         $keyValuePairs = $selectAllocationInput->convertPostToKeyValuePair();
-
 
         foreach ($keyValuePairs as $key => $value) {
             $allocations[] = (new RoleSkinAllocation())
@@ -149,7 +151,10 @@ class ConfigForm extends ilPropertyFormGUI
         $values = [
             "roleToSkinAllocation" => $keyValuePairs,
             "enableAnonSkinChange" => (bool) $this->plugin->settings->get("enableAnonSkinChange", false),
-            "enableAfterLoginSkinAllocation" => (bool) $this->plugin->settings->get("enableAfterLoginSkinAllocation", true)
+            "enableAfterLoginSkinAllocation" => (bool) $this->plugin->settings->get(
+                "enableAfterLoginSkinAllocation",
+                true
+            )
         ];
         $this->setValuesByArray($values, true);
     }

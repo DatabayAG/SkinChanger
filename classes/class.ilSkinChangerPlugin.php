@@ -51,11 +51,11 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
     public static function getInstance() : ilSkinChangerPlugin
     {
         return self::$instance ?? (self::$instance = ilPluginAdmin::getPluginObject(
-                self::CTYPE,
-                self::CNAME,
-                self::SLOT_ID,
-                self::PNAME
-            ));
+            self::CTYPE,
+            self::CNAME,
+            self::SLOT_ID,
+            self::PNAME
+        ));
     }
 
     /**
