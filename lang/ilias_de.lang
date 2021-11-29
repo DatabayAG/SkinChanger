@@ -13,6 +13,9 @@ skinParameterMissingInUrl#:#Skin Parameter fehlt in der url
 enableAnonSkinChange#:#Aktiviere Anonyme SkinChange Funktion
 enableAnonSkinChange_info#:#Ändert den Skin für Anonyme Benutzer (Nicht eingeloggt) temporär.<br>(z.B. auf der Login Seite)
 
+enableAfterLoginSkinAllocation#:#Aktiviere Skin zuweisung nach login
+enableAfterLoginSkinAllocation_info#:#Weist den zugewiesenen Skin für die Rolle zu,<br> nachdem sich der Benutzer angemeldet hat.
+
 selectAllocationInput_count_not_match#:#Anzahl Key Eingabefelder stimmt nicht mit der Anzahl Value Eingabefelder überein
 selectAllocationInput_already_exists#:#Bereits definiert
 selectAllocationInput_form_invalid#:#Das Formular ist fehlerhaft

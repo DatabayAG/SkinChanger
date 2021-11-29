@@ -61,6 +61,14 @@ class ConfigForm extends ilPropertyFormGUI
         $enableAnonSkinChangeInput->setInfo($this->plugin->txt("enableAnonSkinChange_info"));
         $this->addItem($enableAnonSkinChangeInput);
 
+        $enableAfterLoginSkinAllocation = new ilCheckboxInputGUI(
+            $this->plugin->txt("enableAfterLoginSkinAllocation"),
+            "enableAfterLoginSkinAllocation"
+        );
+        $enableAfterLoginSkinAllocation->setInfo($this->plugin->txt("enableAfterLoginSkinAllocation_info"));
+
+        $this->addItem($enableAfterLoginSkinAllocation);
+
         $roleOptions = [];
         foreach ($DIC->rbac()->review()->getAssignableRoles() as $role) {
             $roleOptions[$role["rol_id"]] = $role["title"];
@@ -105,7 +113,8 @@ class ConfigForm extends ilPropertyFormGUI
          */
         $allocations = [];
 
-        $this->settings->set("enableAnonSkinChange", (bool) $this->getInput("enableAnonSkinChange"));
+        $this->plugin->settings->set("enableAnonSkinChange", (bool) $this->getInput("enableAnonSkinChange"));
+        $this->plugin->settings->set("enableAfterLoginSkinAllocation", (bool) $this->getInput("enableAfterLoginSkinAllocation"));
 
         /**
          * @var ilSelectAllocationInput $selectAllocationInput
@@ -139,7 +148,8 @@ class ConfigForm extends ilPropertyFormGUI
         }
         $values = [
             "roleToSkinAllocation" => $keyValuePairs,
-            "enableAnonSkinChange" => (bool) $this->settings->get("enableAnonSkinChange", false)
+            "enableAnonSkinChange" => (bool) $this->plugin->settings->get("enableAnonSkinChange", false),
+            "enableAfterLoginSkinAllocation" => (bool) $this->plugin->settings->get("enableAfterLoginSkinAllocation", true)
         ];
         $this->setValuesByArray($values, true);
     }
