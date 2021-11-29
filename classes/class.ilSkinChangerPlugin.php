@@ -28,7 +28,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      * @var ilSkinChangerPlugin|null
      */
     private static $instance = null;
-    private ilSetting $settings;
+    public ilSetting $settings;
 
     public function __construct()
     {
@@ -51,11 +51,11 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
     public static function getInstance() : ilSkinChangerPlugin
     {
         return self::$instance ?? (self::$instance = ilPluginAdmin::getPluginObject(
-            self::CTYPE,
-            self::CNAME,
-            self::SLOT_ID,
-            self::PNAME
-        ));
+                self::CTYPE,
+                self::CNAME,
+                self::SLOT_ID,
+                self::PNAME
+            ));
     }
 
     /**
@@ -68,7 +68,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     public function handleEvent($a_component, $a_event, $a_parameter) : void
     {
-        if ($a_event != "afterLogin" || PHP_SAPI === 'cli') {
+        if ($a_event !== "afterLogin" || PHP_SAPI === 'cli') {
             return;
         }
 
@@ -137,14 +137,13 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 
     /**
      * Sets the user skin and checks if the skin is already the desired skin.
-     * @param $user
-     * @param $skinId
-     * @param $styleId
-     * @return void
+     * @param ilObjUser $user
+     * @param string    $skinId
+     * @param string    $styleId
      */
-    public function setUserSkin($user, $skinId, $styleId)
+    public function setUserSkin(ilObjUser $user, string $skinId, string $styleId) : void
     {
-        if ($user->getPref("skin") != $skinId || $user->getPref("style") != $styleId) {
+        if ($user->getPref("skin") !== $skinId || $user->getPref("style") !== $styleId) {
             $user->setPref("skin", $skinId);
             $user->setPref("style", $styleId);
             $user->writePrefs();
