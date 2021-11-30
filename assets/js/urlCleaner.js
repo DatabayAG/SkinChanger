@@ -4,13 +4,17 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
   let clearUrl = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    let anonSkinId = urlParams.get("anonSkinId");
     let skinChangeTempUrlCleaner = document.querySelector("#skinChange_temp_urlCleaner");
 
-    if(!anonSkinId || !skinChangeTempUrlCleaner) {
+    if(!skinChangeTempUrlCleaner) {
       return;
     }
+
+    let anonSkinId = skinChangeTempUrlCleaner.getAttribute("anonSkinId");
+    if(!anonSkinId) {{
+      return;
+    }}
+
 
     let suffix = skinChangeTempUrlCleaner.textContent;
     skinChangeTempUrlCleaner.remove();
