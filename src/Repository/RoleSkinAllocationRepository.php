@@ -114,7 +114,8 @@ class RoleSkinAllocationRepository
     public function findSkinByRoleId(int $rol_id)
     {
         $result = $this->db->query(
-            "SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}");
+            "SELECT skin_id FROM {$this->tablename} WHERE rol_id = {$this->db->quote($rol_id, "integer")}"
+        );
         return $this->db->fetchAssoc($result)["skin_id"];
     }
 }

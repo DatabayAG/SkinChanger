@@ -15,6 +15,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 {
+    private ?string $skinId = null;
     protected ilCtrl $ctrl;
     protected ilObjUser $user;
     protected HTTPServices $http;
@@ -34,7 +35,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         $this->user = $DIC->user();
         $this->http = $DIC->http();
         $this->request = $DIC->http()->request();
-        $this->plugin = new ilSkinChangerPlugin();
+        $this->plugin = ilSkinChangerPlugin::getInstance();
     }
 
     /** @inheritDoc */
@@ -71,34 +72,61 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     }
 
     /**
-     * @return void
-     * @throws ilSystemStyleException
+     * @return null|string[]
      */
-    public function skinChangeThroughLink() : void
+    private function getSkinData(?string $skinIdOverride = null) : ?array
     {
-        $skinId = $this->request->getQueryParams()["skin"];
+        $skinId = $skinIdOverride ?? $this->request->getQueryParams()["skin"];
+
         $styleId = "";
 
         if (!$skinId) {
-            ilUtil::sendFailure($this->plugin->txt("skinParameterMissingInUrl"), true);
-            $this->redirectToDashboard();
+            return null;
         }
 
         $foundSkin = false;
-        foreach (ilStyleDefinition::getAllSkinStyles() as $skinStyle) {
-            if ($skinId == $skinStyle["skin_id"]) {
-                $foundSkin = true;
-                $styleId = $skinStyle["style_id"];
-                break;
+        try {
+            foreach (ilStyleDefinition::getAllSkinStyles() as $skinStyle) {
+                if ($skinId === $skinStyle["skin_id"]) {
+                    $foundSkin = true;
+                    $styleId = $skinStyle["style_id"];
+                    break;
+                }
             }
+        } catch (Exception $ex) {
+            return null;
         }
 
         if (!$foundSkin) {
+            return null;
+        }
+
+        return [
+            "skinId" => $skinId,
+            "styleId" => $styleId,
+        ];
+    }
+
+    /**
+     * @return void
+     */
+    public function skinChangeThroughLink() : void
+    {
+        if (!(bool) $this->plugin->settings->get("allowSkinOverride") || !(bool) $this->plugin->settings->get("enableAfterLoginSkinAllocation")) {
+            $this->redirectToDashboard();
+        }
+
+        $skinData = $this->getSkinData();
+
+        if (!$skinData) {
             ilUtil::sendFailure($this->plugin->txt("requestedSkinNotFound"), true);
             $this->redirectToDashboard();
         }
 
-        if ($this->user->getPref("skinOverride") != $skinId) {
+        $skinId = $skinData["skinId"];
+        $styleId = $skinData["styleId"];
+
+        if ($this->user->getPref("skinOverride") !== $skinId) {
             $this->user->setPref("skinOverride", $skinId);
             $this->user->writePrefs();
             $this->plugin->setUserSkin($this->user, $skinId, $styleId);
@@ -128,10 +156,12 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
                 $additionalParameters .= '&target=' . $target;
             }
 
-            if (defined('CLIENT_ID')) {
-                $additionalParameters .= '&client_id=' . CLIENT_ID;
+            if (!(bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange")) {
+                if (defined('CLIENT_ID')) {
+                    $additionalParameters .= '&client_id=' . CLIENT_ID;
+                }
+                $this->ctrl->redirectToURL('login.php?cmd=force_login' . $additionalParameters);
             }
-            $this->ctrl->redirectToURL('login.php?cmd=force_login' . $additionalParameters);
         }
 
         $this->performCommand($cmd);
@@ -151,10 +181,89 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         }
     }
 
-    /** @inheritDoc */
     public function getHTML($a_comp, $a_part, $a_par = array()) : array
     {
-        return parent::getHTML($a_comp, $a_part, $a_par);
+        $tplId = $a_par["tpl_id"];
+        $html = $a_par["html"];
+
+        if (!$this->user->isAnonymous() || !(bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange")) {
+            if ($this->user->id !== 0) {
+                return $this->uiHookResponse();
+            }
+        }
+        $query = $this->request->getQueryParams();
+
+        if ($a_part === "redirect" && $query["target"] === "skinChangeThroughLink" && isset($query["skin"])) {
+            ilUtil::setCookie("anonSkinChange", $query["skin"]);
+        }
+
+        if ($tplId !== "src/UI/templates/default/Layout/tpl.standardpage.html" || !$html || $a_part !== "template_get") {
+            return $this->uiHookResponse();
+        }
+
+        $match = [];
+        if (!preg_match(
+            '/\/skin.+\/(.+\.css)|default\/(delos\.css)/m',
+            $html,
+            $match
+        ) || !$match || count($match) < 2) {
+            return $this->uiHookResponse();
+        }
+
+
+        $skinIdOverride = $_COOKIE["anonSkinChange"] ?? null;
+
+        if ($skinIdOverride === null) {
+            return $this->uiHookResponse();
+        }
+
+        try {
+            $currentStyle = ilStyleDefinition::getCurrentStyle();
+            $currentSkin = ilStyleDefinition::getCurrentSkin();
+        } catch (Exception $ex) {
+            return $this->uiHookResponse();
+        }
+
+        $skinData = $this->getSkinData($skinIdOverride);
+
+        if (!$skinData) {
+            ilUtil::sendFailure($this->plugin->txt("requestedSkinNotFound"), true);
+            $this->redirectToDashboard();
+        }
+
+        $skinId = $skinData["skinId"];
+        $styleId = $skinData["styleId"];
+
+        if ($currentSkin === "default") {
+            $currentCssPath = "./templates/";
+            $newCssPath = "./templates/";
+            if ($skinId !== "default") {
+                $newCssPath = "./Customizing/global/skin/";
+            }
+        } else {
+            $currentCssPath = "./Customizing/global/skin/";
+            $newCssPath = "./Customizing/global/skin/";
+
+            if ($skinId === "default") {
+                $newCssPath = "./templates/";
+            }
+        }
+        $currentCssPath .= "$currentSkin/$currentStyle.css";
+        $newCssPath .= "$skinId/$styleId.css";
+
+        if ($currentCssPath !== $newCssPath) {
+            $html = str_replace($currentCssPath, $newCssPath, $html);
+        }
+
+        $anonSkinChangeUrlCleanerSuffix = $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "");
+
+        $html = str_replace(
+            "</head>",
+            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div style='display: none;' anonSkinId='$skinId' id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
+            $html
+        );
+
+        return $this->uiHookResponse(self::REPLACE, $html);
     }
 
     /** @inheritDoc */
@@ -169,5 +278,16 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     protected function redirectToDashboard()
     {
         $this->ctrl->redirectByClass(ilDashboardGUI::class, "show");
+    }
+
+    /**
+     * Returns the array used to replace the html content
+     * @param string $mode
+     * @param string $html
+     * @return string[]
+     */
+    protected function uiHookResponse(string $mode = ilUIHookPluginGUI::KEEP, string $html = "") : array
+    {
+        return ['mode' => $mode, 'html' => $html];
     }
 }
