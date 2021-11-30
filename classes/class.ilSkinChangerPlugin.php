@@ -74,6 +74,10 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 
         ilSession::set("anonSkinChange", null);
 
+        if (!(bool) $this->settings->get("enableAfterLoginSkinAllocation", false)) {
+            return;
+        }
+
         global $DIC;
         $repository = RoleSkinAllocationRepository::getInstance();
         $user = $DIC->user();
@@ -110,7 +114,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         }
 
         //Checks if user changed his skin using the override link and if so changes the users skin to the defined override one.
-        if (($override = $this->checkUserHasOverriddenSkin($user))) {
+        if ((bool) $this->settings->get("allowSkinOverride", false) && ($override = $this->checkUserHasOverriddenSkin($user))) {
             $this->setUserSkin($user, $override["skinId"], $override["styleId"]);
             return;
         }
