@@ -10,6 +10,18 @@ cmdNotFound#:#Das command wurde nicht in der url gefunden
 requestedSkinNotFound#:#Angeforderter skin wurde nicht gefunden
 skinParameterMissingInUrl#:#Skin Parameter fehlt in der url
 
+enableAnonSkinChange#:#Aktiviere Anonyme SkinChange Funktion
+enableAnonSkinChange_info#:#Ändert den Skin für Anonyme Benutzer (Nicht eingeloggt) temporär auf der Login Seite.
+
+enableAfterLoginSkinAllocation#:#Aktiviere Skin zuweisung nach login
+enableAfterLoginSkinAllocation_info#:#Weist den zugewiesenen Skin für die Rolle zu,<br> nachdem sich der Benutzer angemeldet hat.
+
+anonSkinChangeUrlCleanerSuffix#:#Suffix, der nach der Bereinigung des Logins an die Url angehängt wird
+anonSkinChangeUrlCleanerSuffix_info#:#Beispiel: .html<br>Auf der login Seite wird für den databay60 skin dann<br>z.B. https://ilias7/databay60.html statt https://ilias7/databay60 angezeigt
+
+allowSkinOverride#:#Skin-Überschreibung zulassen
+allowSkinOverride_info#:#Erlaubt dem Benutzer seine Skin zuweisung zu überschreiben und die Zuweisung zu ignorieren.
+
 selectAllocationInput_count_not_match#:#Anzahl Key Eingabefelder stimmt nicht mit der Anzahl Value Eingabefelder überein
 selectAllocationInput_already_exists#:#Bereits definiert
 selectAllocationInput_form_invalid#:#Das Formular ist fehlerhaft

@@ -10,17 +10,52 @@ use SkinChanger\Repository\RoleSkinAllocationRepository;
  */
 class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
 {
+    /** @var string */
+    public const CTYPE = "Services";
+    /** @var string */
+    public const CNAME = "UIComponent";
+    /** @var string */
+    public const SLOT_ID = "uihk";
+    /** @var string */
+    public const PNAME = "SkinChanger";
+
     /**
      * @var int[]
      */
     protected const blacklistedUserIds = [ANONYMOUS_USER_ID];
 
     /**
+     * @var ilSkinChangerPlugin|null
+     */
+    private static $instance = null;
+    public ilSetting $settings;
+
+    public function __construct()
+    {
+        $this->settings = new ilSetting(self::class);
+        parent::__construct();
+    }
+
+    /**
      * @inheritdoc
      */
     public function getPluginName() : string
     {
-        return "SkinChanger";
+        return self::PNAME;
+    }
+
+    /**
+     * @return ilSkinChangerPlugin
+     * @noinspection PhpIncompatibleReturnTypeInspection
+     */
+    public static function getInstance() : ilSkinChangerPlugin
+    {
+        return self::$instance ?? (self::$instance = ilPluginAdmin::getPluginObject(
+            self::CTYPE,
+            self::CNAME,
+            self::SLOT_ID,
+            self::PNAME
+        ));
     }
 
     /**
@@ -33,7 +68,13 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     public function handleEvent($a_component, $a_event, $a_parameter) : void
     {
-        if ($a_event != "afterLogin" || PHP_SAPI === 'cli') {
+        if ($a_event !== "afterLogin" || PHP_SAPI === 'cli') {
+            return;
+        }
+
+        ilUtil::setCookie("anonSkinChange", null, true, true);
+
+        if (!(bool) $this->settings->get("enableAfterLoginSkinAllocation", false)) {
             return;
         }
 
@@ -73,7 +114,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         }
 
         //Checks if user changed his skin using the override link and if so changes the users skin to the defined override one.
-        if (($override = $this->checkUserHasOverriddenSkin($user))) {
+        if ((bool) $this->settings->get("allowSkinOverride", false) && ($override = $this->checkUserHasOverriddenSkin($user))) {
             $this->setUserSkin($user, $override["skinId"], $override["styleId"]);
             return;
         }
@@ -100,16 +141,43 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         return null;
     }
 
+    public function assetsFolder(string $file = "") : string
+    {
+        return $this->getDirectory() . "/assets/$file";
+    }
+
+    public function cssFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("css/$file");
+    }
+
+    public function imagesFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("images/$file");
+    }
+
+    public function templatesFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("templates/$file");
+    }
+
+    public function jsFolder(string $file = "") : string
+    {
+        return $this->assetsFolder("js/$file");
+    }
+
     /**
      * Sets the user skin and checks if the skin is already the desired skin.
-     * @param $user
-     * @param $skinId
-     * @param $styleId
-     * @return void
+     * @param ilObjUser $user
+     * @param string    $skinId
+     * @param string    $styleId
      */
-    public function setUserSkin($user, $skinId, $styleId)
+    public function setUserSkin(ilObjUser $user, string $skinId, string $styleId) : void
     {
-        if ($user->getPref("skin") != $skinId || $user->getPref("style") != $styleId) {
+        if($user->isAnonymous()) {
+            return;
+        }
+        if ($user->getPref("skin") !== $skinId || $user->getPref("style") !== $styleId) {
             $user->setPref("skin", $skinId);
             $user->setPref("style", $styleId);
             $user->writePrefs();
@@ -130,7 +198,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
         if ($database->tableExists("ui_uihk_skcr_alloc")) {
             $database->dropTable("ui_uihk_skcr_alloc");
         }
-
+        $this->settings->deleteAll();
         return parent::beforeUninstall();
     }
 }

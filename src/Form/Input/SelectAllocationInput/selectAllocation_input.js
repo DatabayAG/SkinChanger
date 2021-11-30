@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     let clone = row.cloneNode(true);
     row.after(clone);
     let errorMessage = clone.querySelector(".help-block");
-    if(errorMessage){
+    if (errorMessage) {
       errorMessage.remove();
     }
     clone.querySelector("button[name=add]").addEventListener("click", addRow);
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let removeRow = (event) => {
     let row = event.target.parentNode.parentNode;
     let rows = row.parentNode.querySelectorAll(".selectAllocation_row");
-    if(rows.length > 1){
+    if (rows.length > 1) {
       row.remove();
     }
   }
