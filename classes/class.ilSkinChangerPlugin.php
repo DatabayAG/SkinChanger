@@ -72,6 +72,8 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
             return;
         }
 
+        ilSession::set("anonSkinChange", null);
+
         global $DIC;
         $repository = RoleSkinAllocationRepository::getInstance();
         $user = $DIC->user();
