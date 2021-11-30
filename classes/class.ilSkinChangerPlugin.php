@@ -72,7 +72,7 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
             return;
         }
 
-        ilSession::set("anonSkinChange", null);
+        ilUtil::setCookie("anonSkinChange", null, true, true);
 
         if (!(bool) $this->settings->get("enableAfterLoginSkinAllocation", false)) {
             return;
@@ -174,6 +174,9 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
      */
     public function setUserSkin(ilObjUser $user, string $skinId, string $styleId) : void
     {
+        if($user->isAnonymous()) {
+            return;
+        }
         if ($user->getPref("skin") !== $skinId || $user->getPref("style") !== $styleId) {
             $user->setPref("skin", $skinId);
             $user->setPref("style", $styleId);

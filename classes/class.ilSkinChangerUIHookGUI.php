@@ -112,6 +112,10 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
      */
     public function skinChangeThroughLink() : void
     {
+        if (!(bool) $this->plugin->settings->get("allowSkinOverride") || !(bool) $this->plugin->settings->get("enableAfterLoginSkinAllocation")) {
+            $this->redirectToDashboard();
+        }
+
         $skinData = $this->getSkinData();
 
         if (!$skinData) {
@@ -122,7 +126,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         $skinId = $skinData["skinId"];
         $styleId = $skinData["styleId"];
 
-        if ($this->user->getPref("skinOverride") != $skinId) {
+        if ($this->user->getPref("skinOverride") !== $skinId) {
             $this->user->setPref("skinOverride", $skinId);
             $this->user->writePrefs();
             $this->plugin->setUserSkin($this->user, $skinId, $styleId);
@@ -182,14 +186,15 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         $tplId = $a_par["tpl_id"];
         $html = $a_par["html"];
 
-        if (!(bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange")) {
-            return $this->uiHookResponse();
+        if (!$this->user->isAnonymous() || !(bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange")) {
+            if ($this->user->id !== 0) {
+                return $this->uiHookResponse();
+            }
         }
-
         $query = $this->request->getQueryParams();
 
         if ($a_part === "redirect" && $query["target"] === "skinChangeThroughLink" && isset($query["skin"])) {
-            ilSession::set("anonSkinChange", $query["skin"]);
+            ilUtil::setCookie("anonSkinChange", $query["skin"]);
         }
 
         if ($tplId !== "src/UI/templates/default/Layout/tpl.standardpage.html" || !$html || $a_part !== "template_get") {
@@ -205,7 +210,8 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
             return $this->uiHookResponse();
         }
 
-        $skinIdOverride = ilSession::get("anonSkinChange");
+
+        $skinIdOverride = $_COOKIE["anonSkinChange"] ?? null;
 
         if ($skinIdOverride === null) {
             return $this->uiHookResponse();
@@ -253,7 +259,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 
         $html = str_replace(
             "</head>",
-            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
+            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div style='display: none;' anonSkinId='$skinId' id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
             $html
         );
 

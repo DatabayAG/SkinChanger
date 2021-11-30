@@ -102,7 +102,11 @@ class ConfigForm extends ilPropertyFormGUI
             )
             ->setRequired(true)
             ->setInfo($this->plugin->txt("info_roleToSkinInput"));
-        $this->addItem($selectAllocationInput);
+        $enableAfterLoginSkinAllocation->addSubItem($selectAllocationInput);
+
+        $allowSkinOverrideInput = new ilCheckboxInputGUI($this->plugin->txt("allowSkinOverride"), "allowSkinOverride");
+        $allowSkinOverrideInput->setInfo($this->plugin->txt("allowSkinOverride_info"));
+        $enableAfterLoginSkinAllocation->addSubItem($allowSkinOverrideInput);
 
         $this->setFormAction($this->ctrl->getFormActionByClass(ilSkinChangerConfigGUI::class, "saveConfiguration"));
         $this->addCommandButton("saveSettings", $this->plugin->txt("save"));
@@ -129,6 +133,11 @@ class ConfigForm extends ilPropertyFormGUI
         $this->plugin->settings->set(
             "anonSkinChangeUrlCleanerSuffix",
             $this->getInput("anonSkinChangeUrlCleanerSuffix")
+        );
+
+        $this->plugin->settings->set(
+            "allowSkinOverride",
+            $this->getInput("allowSkinOverride")
         );
 
         /**
@@ -167,7 +176,8 @@ class ConfigForm extends ilPropertyFormGUI
                 "enableAfterLoginSkinAllocation",
                 true
             ),
-            "anonSkinChangeUrlCleanerSuffix" => $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "")
+            "anonSkinChangeUrlCleanerSuffix" => $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", ""),
+            "allowSkinOverride" => $this->plugin->settings->get("allowSkinOverride", false)
         ];
         $this->setValuesByArray($values, true);
     }
