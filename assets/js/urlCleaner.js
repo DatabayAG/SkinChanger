@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     let suffix = skinChangeTempUrlCleaner.textContent;
     skinChangeTempUrlCleaner.remove();
-    window.history.replaceState(null, '', anonSkinId === "default" ? "login.php" : `${anonSkinId}.${suffix}`);
+    window.history.replaceState(null, '', anonSkinId === "default" ? "login.php" : `${anonSkinId}${suffix}`);
   }
 
   init();
