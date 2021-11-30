@@ -11,13 +11,16 @@ requestedSkinNotFound#:#Requested skin could not be found
 skinParameterMissingInUrl#:#Skin parameter is missing in url
 
 enableAnonSkinChange#:#Enable Anonymous SkinChange feature
-enableAnonSkinChange_info#:#Changes the skin for anonymous users (not logged in) temporarily.(Ex. on the login page)
+enableAnonSkinChange_info#:#Changes the skin for anonymous users (not logged in) temporarily on the login page.
 
 enableAfterLoginSkinAllocation#:#Activates the skin allocation after login
 enableAfterLoginSkinAllocation_info#:#Assigns the allocated skin for the role<br> after the user logs in.
 
 anonSkinChangeUrlCleanerSuffix#:#Suffix to add to url after cleaning login
 anonSkinChangeUrlCleanerSuffix_info#:#Example: .html<br>On the login page for the databay60 skin will then be <br>https://ilias7/databay60.html displayed instead of https://ilias7/databay60
+
+allowSkinOverride#:#Allow skin override
+allowSkinOverride_info#:#Users can override their allocated skin and ignore allocation.
 
 selectAllocationInput_count_not_match#:#Number of key input fields does not match number of value input fields
 selectAllocationInput_already_exists#:#Already defined
