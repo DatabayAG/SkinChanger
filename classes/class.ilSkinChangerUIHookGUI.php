@@ -197,30 +197,13 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
             ilUtil::setCookie("anonSkinChange", $query["skin"]);
         }
 
-        if ($tplId !== "src/UI/templates/default/Layout/tpl.standardpage.html" || !$html || $a_part !== "template_get") {
+        if (!$html && !$a_part) {
             return $this->uiHookResponse();
         }
-
-        $match = [];
-        if (!preg_match(
-            '/\/skin.+\/(.+\.css)|default\/(delos\.css)/m',
-            $html,
-            $match
-        ) || !$match || count($match) < 2) {
-            return $this->uiHookResponse();
-        }
-
 
         $skinIdOverride = $_COOKIE["anonSkinChange"] ?? null;
 
         if ($skinIdOverride === null) {
-            return $this->uiHookResponse();
-        }
-
-        try {
-            $currentStyle = ilStyleDefinition::getCurrentStyle();
-            $currentSkin = ilStyleDefinition::getCurrentSkin();
-        } catch (Exception $ex) {
             return $this->uiHookResponse();
         }
 
@@ -234,36 +217,65 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         $skinId = $skinData["skinId"];
         $styleId = $skinData["styleId"];
 
-        if ($currentSkin === "default") {
-            $currentCssPath = "./templates/";
-            $newCssPath = "./templates/";
-            if ($skinId !== "default") {
-                $newCssPath = "./Customizing/global/skin/";
+        if ($tplId === "Services/Init/tpl.login.html" && $a_part === "template_add") {
+            $skinFolderPath = $this->getSkinFolder($skinId);
+            if (!$skinFolderPath) {
+                return $this->uiHookResponse();
             }
-        } else {
-            $currentCssPath = "./Customizing/global/skin/";
-            $newCssPath = "./Customizing/global/skin/";
 
-            if ($skinId === "default") {
+            return $this->uiHookResponse(self::REPLACE, file_get_contents("$skinFolderPath/Services/Init/tpl.login.html"));
+        }
+
+        if ($tplId === "src/UI/templates/default/Layout/tpl.standardpage.html" && $a_part === "template_get") {
+            $match = [];
+            if (!preg_match(
+                '/\/skin.+\/(.+\.css)|default\/(delos\.css)/m',
+                $html,
+                $match
+            ) || !$match || count($match) < 2) {
+                return $this->uiHookResponse();
+            }
+
+            try {
+                $currentStyle = ilStyleDefinition::getCurrentStyle();
+                $currentSkin = ilStyleDefinition::getCurrentSkin();
+            } catch (Exception $ex) {
+                return $this->uiHookResponse();
+            }
+
+            if ($currentSkin === "default") {
+                $currentCssPath = "./templates/";
                 $newCssPath = "./templates/";
+                if ($skinId !== "default") {
+                    $newCssPath = "./Customizing/global/skin/";
+                }
+            } else {
+                $currentCssPath = "./Customizing/global/skin/";
+                $newCssPath = "./Customizing/global/skin/";
+
+                if ($skinId === "default") {
+                    $newCssPath = "./templates/";
+                }
             }
+            $currentCssPath .= "$currentSkin/$currentStyle.css";
+            $newCssPath .= "$skinId/$styleId.css";
+
+            if ($currentCssPath !== $newCssPath) {
+                $html = str_replace($currentCssPath, $newCssPath, $html);
+            }
+
+            $anonSkinChangeUrlCleanerSuffix = $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "");
+
+            $html = str_replace(
+                "</head>",
+                "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div style='display: none;' anonSkinId='$skinId' id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
+                $html
+            );
+
+            return $this->uiHookResponse(self::REPLACE, $html);
         }
-        $currentCssPath .= "$currentSkin/$currentStyle.css";
-        $newCssPath .= "$skinId/$styleId.css";
 
-        if ($currentCssPath !== $newCssPath) {
-            $html = str_replace($currentCssPath, $newCssPath, $html);
-        }
-
-        $anonSkinChangeUrlCleanerSuffix = $this->plugin->settings->get("anonSkinChangeUrlCleanerSuffix", "");
-
-        $html = str_replace(
-            "</head>",
-            "<script src=\"{$this->plugin->jsFolder("urlCleaner.js")}\"></script><div style='display: none;' anonSkinId='$skinId' id='skinChange_temp_urlCleaner'>$anonSkinChangeUrlCleanerSuffix</div></head>",
-            $html
-        );
-
-        return $this->uiHookResponse(self::REPLACE, $html);
+        return $this->uiHookResponse();
     }
 
     /** @inheritDoc */
@@ -278,6 +290,36 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
     protected function redirectToDashboard()
     {
         $this->ctrl->redirectByClass(ilDashboardGUI::class, "show");
+    }
+
+    protected function getSkinFolder(string $skinId) : ?string
+    {
+        $skinFolderPath = dirname($this->plugin->getDirectory(), 5) . "/skin";
+
+        if (!is_dir($skinFolderPath)) {
+            return null;
+        }
+
+        foreach (scandir($skinFolderPath) as $folder) {
+            if ($folder === "." || $folder === "..") {
+                continue;
+            }
+
+            $templateFile = "$skinFolderPath/$folder/template.xml";
+
+            if (!is_file($templateFile)) {
+                continue;
+            }
+
+            $templateXmlElement = simplexml_load_string(file_get_contents($templateFile));
+
+            $foundSkinId = (string) $templateXmlElement->style->attributes()["id"];
+
+            if ($foundSkinId === $skinId) {
+                return "$skinFolderPath/$folder";
+            }
+        }
+        return null;
     }
 
     /**
