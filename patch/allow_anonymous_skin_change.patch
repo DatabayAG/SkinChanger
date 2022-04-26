@@ -1,0 +1,34 @@
+Index: Services/Init/classes/class.ilInitialisation.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Services/Init/classes/class.ilInitialisation.php b/Services/Init/classes/class.ilInitialisation.php
+--- a/Services/Init/classes/class.ilInitialisation.php	(revision ca826ff1a3cbf98a835dd2e7dccd9c84cf401d81)
++++ b/Services/Init/classes/class.ilInitialisation.php	(date 1650963215300)
+@@ -1138,7 +1138,16 @@
+             if (ilContext::hasUser()) {
+                 self::initUser();
+ 
+-                if (ilContext::supportsPersistentSessions()) {
++                $authed = $GLOBALS['DIC']['ilAuthSession']->isAuthenticated();
++                $expired = $GLOBALS['DIC']['ilAuthSession']->isExpired();
++
++                $anonSkinChange = $_COOKIE["anonSkinChange"]
++                    && (
++                        !$authed
++                        ||
++                        $expired
++                    );
++                if (!$anonSkinChange && ilContext::supportsPersistentSessions()) {
+                     self::resumeUserSession();
+                 }
+             }
+@@ -1356,6 +1365,7 @@
+      */
+     public static function resumeUserSession()
+     {
++        return self::initUserAccount();
+         global $DIC;
+         if (ilAuthUtils::isAuthenticationForced()) {
+             ilAuthUtils::handleForcedAuthentication();
