@@ -5,30 +5,30 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/Services/Init/classes/class.ilInitialisation.php b/Services/Init/classes/class.ilInitialisation.php
 --- a/Services/Init/classes/class.ilInitialisation.php	(revision ca826ff1a3cbf98a835dd2e7dccd9c84cf401d81)
-+++ b/Services/Init/classes/class.ilInitialisation.php	(date 1650963215300)
-@@ -1138,7 +1138,16 @@
++++ b/Services/Init/classes/class.ilInitialisation.php	(date 1650972019222)
+@@ -1138,7 +1138,24 @@
              if (ilContext::hasUser()) {
                  self::initUser();
  
 -                if (ilContext::supportsPersistentSessions()) {
-+                $authed = $GLOBALS['DIC']['ilAuthSession']->isAuthenticated();
-+                $expired = $GLOBALS['DIC']['ilAuthSession']->isExpired();
++                global $DIC;
 +
-+                $anonSkinChange = $_COOKIE["anonSkinChange"]
-+                    && (
-+                        !$authed
-+                        ||
-+                        $expired
++                $anonSkinChangeEnabled = (bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange");
++                $authed = (bool) $GLOBALS['DIC']['ilAuthSession']->isAuthenticated();
++                $expired = (bool) $GLOBALS['DIC']['ilAuthSession']->isExpired();
++
++                $query = $DIC->http()->request()->getQueryParams();
++                $target = $query['target'];
++                $skin = $query['skin'];
++
++                $anonSkinChangeBypass = $anonSkinChangeEnabled
++                    && (!$authed || $expired)
++                    && ($_COOKIE["anonSkinChange"] || (
++                        isset($target, $skin)
++                        && $target === "skinChangeThroughLink"
++                        )
 +                    );
-+                if (!$anonSkinChange && ilContext::supportsPersistentSessions()) {
++                if(!$anonSkinChangeBypass && ilContext::supportsPersistentSessions()) {
                      self::resumeUserSession();
                  }
              }
-@@ -1356,6 +1365,7 @@
-      */
-     public static function resumeUserSession()
-     {
-+        return self::initUserAccount();
-         global $DIC;
-         if (ilAuthUtils::isAuthenticationForced()) {
-             ilAuthUtils::handleForcedAuthentication();
