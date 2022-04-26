@@ -132,7 +132,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
             $this->plugin->setUserSkin($this->user, $skinId, $styleId);
         }
 
-        if ($this->user->isAnonymous()) {
+        if ($this->user->isAnonymous() || $this->user->getLogin() === null) {
             $this->ctrl->redirectToURL('login.php');
         } else {
             $this->redirectToDashboard();
