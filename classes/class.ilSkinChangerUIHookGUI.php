@@ -132,11 +132,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
             $this->plugin->setUserSkin($this->user, $skinId, $styleId);
         }
 
-        if ($this->user->isAnonymous() || $this->user->getLogin() === null) {
-            $this->ctrl->redirectToURL('login.php');
-        } else {
-            $this->redirectToDashboard();
-        }
+        $this->redirectToDashboard();
     }
 
     /**
@@ -293,9 +289,13 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
      * Redirects the user to the dashboard page
      * @return void
      */
-    protected function redirectToDashboard()
+    protected function redirectToDashboard() : void
     {
-        $this->ctrl->redirectByClass(ilDashboardGUI::class, "show");
+        if ($this->user->isAnonymous() || $this->user->getLogin() === null) {
+            $this->ctrl->redirectToURL('login.php');
+        } else {
+            $this->ctrl->redirectByClass(ilDashboardGUI::class, "show");
+        }
     }
 
     protected function getSkinFolder(string $skinId) : ?string
