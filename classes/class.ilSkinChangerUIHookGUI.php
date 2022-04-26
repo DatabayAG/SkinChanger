@@ -276,6 +276,8 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
                 $html
             );
 
+            ilUtil::setCookie("anonSkinChange", null, true, true);
+
             return $this->uiHookResponse(self::REPLACE, $html);
         }
 
