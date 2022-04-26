@@ -15,7 +15,6 @@
       * [Nginx Setup](#nginx-setup) 
       * [Patch](#patch)
       * [Skin installationn](#skin-installationn)
-    * [Usage](#usage)
 
 ---
 
@@ -69,7 +68,3 @@ git apply Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/Skin
 Place the skins folder into the folder located at **Customizing/global/skin/**  
 Example for the databay60 skin: **Customizing/global/skin/databay60**  
 In this example the databay60 folder then contains the template.xml file
-
-### Bugs
-
-None known
