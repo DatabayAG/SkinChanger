@@ -5,29 +5,51 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 ===================================================================
 diff --git a/Services/Init/classes/class.ilInitialisation.php b/Services/Init/classes/class.ilInitialisation.php
 --- a/Services/Init/classes/class.ilInitialisation.php	(revision ca826ff1a3cbf98a835dd2e7dccd9c84cf401d81)
-+++ b/Services/Init/classes/class.ilInitialisation.php	(date 1650972019222)
-@@ -1138,7 +1138,24 @@
++++ b/Services/Init/classes/class.ilInitialisation.php	(date 1651149239853)
+@@ -1138,7 +1138,46 @@
              if (ilContext::hasUser()) {
                  self::initUser();
  
 -                if (ilContext::supportsPersistentSessions()) {
 +                global $DIC;
 +
-+                $anonSkinChangeEnabled = (bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange");
-+                $authed = (bool) $GLOBALS['DIC']['ilAuthSession']->isAuthenticated();
-+                $expired = (bool) $GLOBALS['DIC']['ilAuthSession']->isExpired();
-+
-+                $query = $DIC->http()->request()->getQueryParams();
-+                $target = $query['target'];
-+                $skin = $query['skin'];
-+
-+                $anonSkinChangeBypass = $anonSkinChangeEnabled
-+                    && (!$authed || $expired)
-+                    && ($_COOKIE["anonSkinChange"] || (
-+                        isset($target, $skin)
-+                        && $target === "skinChangeThroughLink"
-+                        )
++                try {
++                    /**
++                     * @var $skinChangerPlugin ilSkinChangerPlugin|null
++                     */
++                    $skinChangerPlugin = ilPluginAdmin::getPluginObject(
++                        "Services",
++                        "UIComponent",
++                        "uihk",
++                        "SkinChanger"
 +                    );
++                } catch (Exception $ex) {
++                    $skinChangerPlugin = null;
++                }
++
++                $anonSkinChangeBypass = false;
++
++                if (
++                    $skinChangerPlugin
++                    && $skinChangerPlugin->isActive()
++                    && (bool) ilSkinChangerPlugin::getInstance()->settings->get("enableAnonSkinChange")
++                ) {
++                    $authed = (bool) $GLOBALS['DIC']['ilAuthSession']->isAuthenticated();
++                    $expired = (bool) $GLOBALS['DIC']['ilAuthSession']->isExpired();
++
++                    $query = $DIC->http()->request()->getQueryParams();
++                    $target = $query['target'];
++                    $skin = $query['skin'];
++
++                    $anonSkinChangeBypass = (!$authed || $expired)
++                        && ($_COOKIE["anonSkinChange"] || (
++                                isset($target, $skin)
++                                && $target === "skinChangeThroughLink"
++                            )
++                        );
++                }
++
++
 +                if(!$anonSkinChangeBypass && ilContext::supportsPersistentSessions()) {
                      self::resumeUserSession();
                  }
