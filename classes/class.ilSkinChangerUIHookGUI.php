@@ -322,7 +322,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 
             $templateXmlElement = simplexml_load_string(file_get_contents($templateFile));
 
-            $foundSkinId = (string) $templateXmlElement->style->attributes()["id"];
+            $foundSkinId = (string) $templateXmlElement->attributes()["name"];
 
             if ($foundSkinId === $skinId) {
                 return "$skinFolderPath/$folder";
