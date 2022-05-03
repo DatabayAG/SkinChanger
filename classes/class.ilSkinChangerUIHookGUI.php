@@ -220,7 +220,10 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
         if ($tplId === "Services/Init/tpl.login.html" && $a_part === "template_add") {
             $skinFolderPath = $this->getSkinFolder($skinId);
             if (!$skinFolderPath) {
-                return $this->uiHookResponse();
+                return $this->uiHookResponse(
+                    self::REPLACE,
+                    file_get_contents("/home/www/ilias7/Services/Init/templates/default/tpl.login.html")
+                );
             }
 
             return $this->uiHookResponse(self::REPLACE, file_get_contents("$skinFolderPath/Services/Init/tpl.login.html"));
@@ -319,7 +322,7 @@ class ilSkinChangerUIHookGUI extends ilUIHookPluginGUI
 
             $templateXmlElement = simplexml_load_string(file_get_contents($templateFile));
 
-            $foundSkinId = (string) $templateXmlElement->style->attributes()["id"];
+            $foundSkinId = (string) $templateXmlElement->attributes()["name"];
 
             if ($foundSkinId === $skinId) {
                 return "$skinFolderPath/$folder";
