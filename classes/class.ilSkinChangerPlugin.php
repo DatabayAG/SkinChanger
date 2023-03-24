@@ -102,12 +102,17 @@ class ilSkinChangerPlugin extends ilUserInterfaceHookPlugin
             }
         }
 
-        foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
-            if ($availableStyle["skin_id"] == $skinId) {
-                $styleId = $availableStyle["style_id"];
-                break;
+        try {
+            foreach (ilStyleDefinition::getAllSkinStyles() as $availableStyle) {
+                if ($availableStyle["skin_id"] == $skinId) {
+                    $styleId = $availableStyle["style_id"];
+                    break;
+                }
             }
+        } catch (Exception $ex) {
+            return;
         }
+
 
         if (!$styleId) {
             return;
